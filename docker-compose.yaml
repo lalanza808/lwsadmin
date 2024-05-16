@@ -12,7 +12,10 @@ volumes:
 services:
   lwsadmin:
     container_name: lwsadmin
-    image: lalanza808/lwsadmin:latest
+    build:
+      context: lwsadmin
+      dockerfile: Dockerfile
+    # image: lalanza808/lwsadmin:latest
     restart: unless-stopped
     depends_on:
       - monero-lws
@@ -34,11 +37,14 @@ services:
     <<: *log-config
   mymonero-web:
     container_name: mymonero-web
-    image: lalanza808/mymonero-web-js:latest
+    # image: lalanza808/mymonero-web-js:latest
+    build:
+      context: mymonero-web-js
+      dockerfile: Dockerfile
     restart: unless-stopped
     environment:
       MYMONERO_WEB_NETTYPE: 0
-      MYMONERO_WEB_SERVER_URL: http://localhost:8080/
+      MYMONERO_WEB_SERVER_URL: http://127.0.0.1:8080/
       MYMONERO_WEB_APP_NAME: LZAXMR
     ports:
       - 127.0.0.1:9110:80
@@ -47,12 +53,10 @@ services:
     <<: *log-config
   monero-lws:
     container_name: monero-lws
-    image: lalanza808/monero-lws:develop
-    # build:
-    #   context: monero-lws
-    #   dockerfile: Dockerfile
-    #   args:
-    #     NPROC: 16
+    # image: lalanza808/monero-lws:989b8cd8574797efa66b3b06bc077b6e36ebc074
+    build:
+      context: monero-lws
+      dockerfile: Dockerfile
     restart: unless-stopped
     depends_on:
       - monerod
@@ -64,15 +68,18 @@ services:
       - 8081/tcp
     volumes:
       - lws:/home/monero-lws/.bitmonero/light_wallet_server
+    environment:
+      SCAN_THREADS: ${SCAN_THREADS:-4}
+      REST_THREADS: ${REST_THREADS:-2}
     command:
-      --scan-threads 4 --rest-threads 4 --rest-server http://0.0.0.0:8080 --admin-rest-server http://0.0.0.0:8081 --log-level 1 --daemon=tcp://monerod:18082 --sub=tcp://monerod:18083 --confirm-external-bind --access-control-origin "*"
+      --scan-threads ${SCAN_THREADS} --rest-threads ${REST_THREADS} --rest-server http://0.0.0.0:8080 --admin-rest-server http://0.0.0.0:8081 --log-level 1 --daemon=tcp://monerod:18082 --sub=tcp://monerod:18083 --confirm-external-bind --access-control-origin "*"
     <<: *log-config
   monerod:
     container_name: monerod
-    image: lalanza808/monerod:v0.18.3.1
-    # build:
-    #   context: docker-monero-node/dockerfiles
-    #   dockerfile: monero
+    # image: lalanza808/monerod:latest
+    build:
+      context: docker-monero-node/dockerfiles
+      dockerfile: monero
     restart: unless-stopped
     volumes:
       - ~/.bitmonero:/srv/monerod
@@ -82,6 +89,8 @@ services:
       - 18082/tcp
       - 18083/tcp
       - 18089/tcp
+    ports:
+      - 127.0.0.1:18081:18081
     command:
       monerod --data-dir /srv/monerod/ --p2p-bind-ip=0.0.0.0 --p2p-bind-port=18080 --rpc-bind-ip=0.0.0.0 --rpc-bind-port=18081 --zmq-rpc-bind-ip=0.0.0.0 --zmq-rpc-bind-port=18082 --zmq-pub tcp://0.0.0.0:18083 --rpc-restricted-bind-ip=0.0.0.0 --rpc-restricted-bind-port=18089 --non-interactive --confirm-external-bind --public-node
     <<: *log-config

@@ -1,7 +1,7 @@
 init:
-	git clone --recursive --branch develop https://github.com/vtnerd/monero-lws
+	git clone --recursive --branch release-v0.3_0.18 https://github.com/vtnerd/monero-lws
 	git clone https://github.com/lalanza808/docker-monero-node
-	git clone https://github.com/CryptoGrampy/mymonero-web-js
+	git clone https://github.com/lalanza808/mymonero-web-js
 
 release:
 	docker-compose -f release.compose.yaml build

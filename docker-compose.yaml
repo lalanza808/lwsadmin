@@ -40,18 +40,18 @@ services:
     depends_on:
       - monerod
     ports:
-      - 127.0.0.1:8882:8081
-      - 127.0.0.1:8880:8080
+      - 127.0.0.1:${REST_PORT:-8080}:8080
+      - 127.0.0.1:${ADMIN_PORT:-8081}:8081
     volumes:
       - lws:/home/monero-lws/.bitmonero/light_wallet_server
     environment:
       SCAN_THREADS: ${SCAN_THREADS:-4}
       REST_THREADS: ${REST_THREADS:-2}
-      REST_PORT: ${REST_PORT:-8080}
+      REST_PORT: 
       ADMIN_PORT: ${ADMIN_PORT:-8081}
       MAX_SUBADDRESS: ${MAX_SUBADDRESS:-200}
     command:
-      --scan-threads ${SCAN_THREADS} --rest-threads ${REST_THREADS} --rest-server http://0.0.0.0:${REST_PORT} --admin-rest-server http://0.0.0.0:${ADMIN_PORT} --log-level 1 --daemon=tcp://monerod:18082 --sub=tcp://monerod:18083 --confirm-external-bind --access-control-origin "*" --max-subaddresses ${MAX_SUBADDRESS}
+      --scan-threads ${SCAN_THREADS} --rest-threads ${REST_THREADS} --rest-server http://0.0.0.0:8080 --admin-rest-server http://0.0.0.0:8081 --log-level 1 --daemon=tcp://monerod:18082 --sub=tcp://monerod:18083 --confirm-external-bind --access-control-origin "*" --max-subaddresses ${MAX_SUBADDRESS}
     <<: *log-config
   monerod:
     container_name: monerod

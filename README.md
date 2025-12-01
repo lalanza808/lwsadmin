@@ -24,7 +24,7 @@ docker exec -ti monero-lws monero-lws-admin create_admin
 
 Proceed to setup your user at http://127.0.0.1:5000/setup - use the LWS admin address and key from the previous command.
 
-Start adding wallets.
+Start adding wallets in your lightwallet client. Check out a new lightwallet, [Skylight](https://skylight.magicgrants.org/).
 
 ### Links
 

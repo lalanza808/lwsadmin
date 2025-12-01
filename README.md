@@ -1,68 +1,35 @@
-# monero-lw
+# lwsadmin
 
 Monero lightwallet project. Packages the following services in one package:
 
 * `monero-lws` by [vtnerd](https://github.com/vtnerd/monero-lws) - scans your wallet's view keys in the background
-* `lwsadmin` by [lza_menace](https://lzahq.tech) - backend CRUD app for managing the LWS backend
+* `lwsadmin` by lza_menace - backend CRUD app for managing the LWS backend
 * `monerod` by [The Monero Project](https://github.com/monero-project/monero) - node for syncing Monero blockchain transactions
-* `mymonero-web` by [MyMonero](https://mymonero.com) but forked and cleaned up for personal use by [CryptoGrampy](https://github.com/CryptoGrampy/mymonero-web-js) - the web wallet client
-
 
 ## Running
 
-The default compose stack pulls in images which were pre-built for ease of use. See the `development` section to build everything locally.
+The default compose stack pulls in images which were pre-built for ease of use.
 
-Otherwise, clone the repo and run: `docker-compose up -d`
+Clone the repo and run: `docker-compose up -d`
 
 - `lwsadmin` will be available at http://127.0.0.1:5000
-- `mymonero-web` will be available at http://127.0.0.1:9110
 - `monero-lws` will be available at http://127.0.0.1:8080 (rpc) and http://127.0.0.1:8081 (admin)
 - `monerod` will be available at :18080 (p2p), :18081 (unrestricted rpc), :18082 (zmq), and :18089 (restricted rpc)
 
+Before finishing you need to setup `lwsadmin` with credentials to manage `monero-lws`. Run the following to generate a new admin user in LWS:
 
-## Development
-
-Built on Ubuntu 22.04
-
-1. Install packages
-2. Clone the repo
-3. Clone other projects
-4. Build container images
-5. Run containers
-6. Initialize admin - note address and key
-
-```
-# 1
-sudo apt install docker.io docker-compose python3 python3-venv make
-
-# 2
-git clone https://git.cloud.lzahq.tech/nerodev/monero-lw && cd monero-lw
-
-# 3
-git clone --recursive --branch develop https://github.com/vtnerd/monero-lws
-git clone https://github.com/lalanza808/docker-monero-node
-git clone https://github.com/CryptoGrampy/mymonero-web-js
-
-# 4
-docker-compose build # builds images from the nested repos
-
-# 5
-docker-compose up -d
-
-# 6
+```bash
 docker exec -ti monero-lws monero-lws-admin create_admin
 ```
 
-Proceed to setup your user at http://127.0.0.1:5000/setup - use the LWS admin address and key from `# 6`.
+Proceed to setup your user at http://127.0.0.1:5000/setup - use the LWS admin address and key from the previous command.
 
 Start adding wallets.
-
 
 ### Links
 
 * https://github.com/moneroexamples/openmonero
-* https://github.com/vtnerd/monero-lws/tree/feature/no_auth_admin
-* https://github.com/vtnerd/monero-lws/blob/feature/no_auth_admin/docs/administration.md
+* http://github.com/vtnerd/monero-lws/blob/master/docs/administration.md
 * https://github.com/monero-project/meta/blob/master/api/lightwallet_rest.md
 * https://github.com/CryptoGrampy/monero-lws-admin
 * https://www.npmjs.com/package/@mymonero/mymonero-wallet-manager/v/3.0.0

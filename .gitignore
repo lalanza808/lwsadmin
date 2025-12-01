@@ -1,4 +1,2 @@
-monero-lws
-docker-monero-node
-mymonero-web-js
 .env
+*.pyc

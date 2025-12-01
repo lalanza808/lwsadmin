@@ -1,0 +1,7 @@
+[submodule "monero-lws"]
+	path = monero-lws
+	url = https://github.com/vtnerd/monero-lws
+	branch = release-v0.3_0.18
+[submodule "docker-monero-node"]
+	path = docker-monero-node
+	url = https://github.com/lalanza808/docker-monero-node

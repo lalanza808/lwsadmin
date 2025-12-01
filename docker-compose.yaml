@@ -1,4 +1,3 @@
-version: '3'
 x-log-config: &log-config
   logging:
     driver: json-file
@@ -7,7 +6,6 @@ x-log-config: &log-config
       max-file: "5"
 volumes:
   lws:
-  mymonero:
   lwsadmin:
 services:
   lwsadmin:
@@ -35,62 +33,34 @@ services:
     ports:
       - 127.0.0.1:5000:5000
     <<: *log-config
-  mymonero-web:
-    container_name: mymonero-web
-    # image: lalanza808/mymonero-web-js:latest
-    build:
-      context: mymonero-web-js
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    environment:
-      MYMONERO_WEB_NETTYPE: 0
-      MYMONERO_WEB_SERVER_URL: http://127.0.0.1:8080/
-      MYMONERO_WEB_APP_NAME: LZAXMR
-    ports:
-      - 127.0.0.1:9110:80
-    volumes:
-      - mymonero:/app
-    <<: *log-config
   monero-lws:
     container_name: monero-lws
-    # image: lalanza808/monero-lws:989b8cd8574797efa66b3b06bc077b6e36ebc074
-    build:
-      context: monero-lws
-      dockerfile: Dockerfile
+    image: vtnerd/monero-lws
     restart: unless-stopped
     depends_on:
       - monerod
     ports:
-      - 127.0.0.1:8081:8081
-      - 127.0.0.1:8080:8080
-    expose:
-      - 8080/tcp
-      - 8081/tcp
+      - 127.0.0.1:8882:8081
+      - 127.0.0.1:8880:8080
     volumes:
       - lws:/home/monero-lws/.bitmonero/light_wallet_server
     environment:
       SCAN_THREADS: ${SCAN_THREADS:-4}
       REST_THREADS: ${REST_THREADS:-2}
+      REST_PORT: ${REST_PORT:-8080}
+      ADMIN_PORT: ${ADMIN_PORT:-8081}
+      MAX_SUBADDRESS: ${MAX_SUBADDRESS:-200}
     command:
-      --scan-threads ${SCAN_THREADS} --rest-threads ${REST_THREADS} --rest-server http://0.0.0.0:8080 --admin-rest-server http://0.0.0.0:8081 --log-level 1 --daemon=tcp://monerod:18082 --sub=tcp://monerod:18083 --confirm-external-bind --access-control-origin "*"
+      --scan-threads ${SCAN_THREADS} --rest-threads ${REST_THREADS} --rest-server http://0.0.0.0:${REST_PORT} --admin-rest-server http://0.0.0.0:${ADMIN_PORT} --log-level 1 --daemon=tcp://monerod:18082 --sub=tcp://monerod:18083 --confirm-external-bind --access-control-origin "*" --max-subaddresses ${MAX_SUBADDRESS}
     <<: *log-config
   monerod:
     container_name: monerod
-    # image: lalanza808/monerod:latest
-    build:
-      context: docker-monero-node/dockerfiles
-      dockerfile: monero
+    image: lalanza808/monerod:latest
     restart: unless-stopped
     volumes:
       - ~/.bitmonero:/srv/monerod
-    expose:
-      - 18080/tcp
-      - 18081/tcp
-      - 18082/tcp
-      - 18083/tcp
-      - 18089/tcp
     ports:
       - 127.0.0.1:18081:18081
     command:
-      monerod --data-dir /srv/monerod/ --p2p-bind-ip=0.0.0.0 --p2p-bind-port=18080 --rpc-bind-ip=0.0.0.0 --rpc-bind-port=18081 --zmq-rpc-bind-ip=0.0.0.0 --zmq-rpc-bind-port=18082 --zmq-pub tcp://0.0.0.0:18083 --rpc-restricted-bind-ip=0.0.0.0 --rpc-restricted-bind-port=18089 --non-interactive --confirm-external-bind --public-node
+      monerod --data-dir /srv/monerod/ --p2p-bind-ip=0.0.0.0 --p2p-bind-port=18080 --rpc-bind-ip=0.0.0.0 --rpc-bind-port=18081 --zmq-rpc-bind-ip=0.0.0.0 --zmq-rpc-bind-port=18082 --zmq-pub tcp://0.0.0.0:18083 --rpc-restricted-bind-ip=0.0.0.0 --rpc-restricted-bind-port=18089 --non-interactive --confirm-external-bind
     <<: *log-config

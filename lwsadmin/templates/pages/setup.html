@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Setup your Monero LWS</h1>
+<p class="subtext">The LWS address and view key must be generated from <i>monero-lws</i> using the initialization scripts.</p>
+<form method="post">
+    <label for="username">Username</label>
+    <input type="text" name="username" />
+    <label for="password">Password</label>
+    <input type="password" name="password" />
+    <label for="address">LWS Address</label>
+    <input type="text" name="address" />
+    <label for="view_key">LWS View Key</label>
+    <input type="text" name="view_key" />
+    <button type="submit">Submit</button>
+</form>
+{% endblock %}

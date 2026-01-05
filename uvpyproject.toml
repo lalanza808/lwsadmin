@@ -1,0 +1,15 @@
+[project]
+name = "lwsadmin"
+version = "0.1.0"
+description = "Backend admin panel for a Monero LWS backend"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "monero==1.1.1",
+    "peewee==3.15.3",
+    "python-dotenv>=1.2.1",
+    "quart==0.18.3",
+    "quart-auth==0.8.0",
+    "quart-bcrypt==0.0.6",
+    "requests>=2.32.5",
+]

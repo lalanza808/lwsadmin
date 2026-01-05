@@ -10,3 +10,8 @@ Makefile
 README.md
 .venv
 *.db
+lws
+release.sh
+.env
+.venv
+*.db

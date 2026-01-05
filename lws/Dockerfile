@@ -1,0 +1,19 @@
+FROM ubuntu@sha256:c35e29c9450151419d9448b0fd75374fec4fff364a27f176fb458d472dfc9e54
+
+RUN apt update && apt install git pkg-config libssl-dev libzmq3-dev libunbound-dev libsodium-dev libunwind8-dev liblzma-dev libreadline6-dev libexpat1-dev qttools5-dev-tools libhidapi-dev libusb-1.0-0-dev libprotobuf-dev protobuf-compiler libudev-dev libboost-chrono-dev libboost-date-time-dev libboost-filesystem-dev libboost-locale-dev libboost-program-options-dev libboost-regex-dev libboost-serialization-dev libboost-system-dev libboost-thread-dev python3 ccache doxygen graphviz git curl autoconf libtool gperf cmake build-essential libboost-coroutine-dev -y
+
+RUN git clone https://github.com/vtnerd/monero-lws/ /monero-lws
+
+WORKDIR /monero-lws/build
+
+RUN git checkout f2b353400280f5219de5a90856d7f3814a84eb84 && \
+  git submodule update --init --recursive
+
+RUN cmake -DCMAKE_BUILD_TYPE=Release ../
+RUN make -j$(nproc)
+
+FROM ubuntu:24.04
+
+COPY --from=0 /monero-lws/build/src/monero-lws-* /usr/local/bin
+COPY --from=0 /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
+

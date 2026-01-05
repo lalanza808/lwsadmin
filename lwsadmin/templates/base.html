@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <meta itemprop="name" content="XMR Node Cannon">
+    <meta itemprop="description" content="Send XMR to launch a Monero node for the world.">
+    <meta itemprop="image" content="https://web.getmonero.org/press-kit/symbols/monero-symbol-480.png">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="XMR Node Cannon">
+    <meta property="og:description" content="Send XMR to launch a public Monero node for the world.">
+    <meta property="og:image" content="https://web.getmonero.org/press-kit/symbols/monero-symbol-480.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="XMR Node Cannon">
+    <meta name="twitter:description" content="Send XMR to launch a Monero node for the world.">
+    <meta name="twitter:image" content="https://web.getmonero.org/press-kit/symbols/monero-symbol-480.png">
+    <meta name="keywords" content="monero, xmr, node, daemon, cryptocurrency, network">
+    <!-- <link rel="shortcut icon" href="/images/monero.svg" type="image/x-icon" /> -->
+    <!-- <link rel="stylesheet" href="/css/brutalism.css"> -->
+    <!-- <link id="theme-stylesheet" rel="stylesheet" href="/css/{{ theme }}.css"> -->
+    <!-- <link rel="stylesheet" href="/css/style.css"> -->
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/pruger/tiny-brutalism-css/tiny-brutalism.css">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <div class="row">
+                <a href="https://monero.fail" target="_blank" class="button col">Nodes</a>
+                <a href="https://monerica.com/" target="_blank" class="button col">Directory</a>
+                <a href="https://www.revuo-xmr.com/" target="_blank" class="button col">News</a>
+            </div>
+        </div>
+    </nav>
+    <main class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-danger">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

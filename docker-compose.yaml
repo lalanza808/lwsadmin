@@ -8,6 +8,7 @@ volumes:
   lws:
   lwsadmin:
   postgres:
+  wallet:
 networks:
   tor_net:
     external: true
@@ -31,6 +32,18 @@ services:
     ports:
       - 127.0.0.1:6379:6379
     <<: *log-config
+  wallet:
+    build:
+      context: wallet
+    network_mode: host
+    container_name: monero-lws-wallet
+    restart: always
+    ports:
+      - 127.0.0.1:${WALLET_RPC_PORT:-8000}:${WALLET_RPC_PORT:-8000}
+    volumes:
+      - wallet:/data
+    command:
+      bash /run_wallet.sh "rpcuser:rpcpass" "http://127.0.0.1:18081"
   # lwsadmin:
   #   container_name: lwsadmin
   #   build:

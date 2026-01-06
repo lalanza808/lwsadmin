@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Register</h1>
+<p>
+    Enter in your wallet details below to register. 
+    Before your account will be activated you must pre-pay in XMR at the rate of {{config.PRICE_PICOS_PER_BLOCK}} piconeros ({{ config.PRICE_PICOS_PER_BLOCK }} XMR) per block.
+    Payment details will be shown in the next form.
+</p>
+<div class="alert alert-danger">
+    <h2>Warning</h2>
+    <p>Only new wallets are being accepted at this time. Please provide details of a newly created wallet without any transaction history. Historical restores will not be performed.</p>
+</div>
+<form method="post">
+    <label for="address">Primary Address</label>
+    <input type="text" name="address" />
+    <label for="view_key">View Key</label>
+    <input type="text" name="view_key" />
+    <button type="submit">Register</button>
+</form>
+{% endblock %}

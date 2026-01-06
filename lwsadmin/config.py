@@ -18,7 +18,15 @@ LWS_URL = env.get("LWS_URL", "http://127.0.0.1:8080")
 LWS_ADMIN_URL = env.get("LWS_ADMIN_URL", "http://127.0.0.1:8081")
 
 # Monerod RPC
+MONEROD_PORT = 18081
+MONEROD_PROTO = "http"
+MONEROD_HOST = "127.0.0.1"
 MONEROD_URL = env.get("MONEROD_URL", "http://127.0.0.1:18081")
+
+# Monero Wallet RPC
+WALLET_RPC_USERNAME = env.get("WALLET_RPC_USERNAME", "rpcuser")
+WALLET_RPC_PASSWORD = env.get("WALLET_RPC_PASSWORD", "rpcpass")
+WALLET_RPC_PORT = int(env.get("WALLET_RPC_PORT", 8000))
 
 # Database
 DB_HOST = env.get("DB_HOST", "localhost")
@@ -37,3 +45,7 @@ DB_URI = "postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}".format(
 # Cache
 CACHE_HOST = env.get("CACHE_HOST", "localhost")
 CACHE_PORT = env.get("CACHE_PORT", 6379)
+
+# App
+THEME = env.get("THEME", "light")
+PRICE_PICOS_PER_BLOCK = int(env.get("PRICE_PICOS_PER_BLOCK", 500_000))

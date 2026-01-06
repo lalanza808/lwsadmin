@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<p>
+    To fund additional block scanning, send XMR to the address below.
+    The current price per block is {{ config.PRICE_PICOS_PER_BLOCK | atomic }} XMR.
+    To fund wallet scanning for 90 days it would cost roughly {{ config.PRICE_PICOS_PER_BLOCK * 720 * 90 | atomic }} XMR.
+</p>
+
+<section>
+    <div class="row">
+        <div class="col"><img src="data:image/png;base64,{{ qrcode }}" width="150px"/></div>
+    </div>
+   <p>{{ account.payment_address }}</p>
+   <p>Account Start Height {{ account.start_height }}</p>
+</section>
+
+
+
+
+
+<h2>Pending Transactions</h2>
+<ul>
+{% for tx in pending_txes %}
+<li><a href="https://xmrchain.net/tx/{{ tx.txid }}" target="_blank">{{ tx.txid | shorten }}</a> {{ tx.amount | atomic }} XMR ({{ tx.confirmations }} confirmations)</li>
+{% endfor %}
+</ul>
+
+<h2>Completed Transactions</h2>
+<ul>
+{% for tx in completed_txes %}
+<li><a href="https://xmrchain.net/tx/{{ tx.txid }}" target="_blank">{{ tx.txid | shorten }}</a> {{ tx.amount | atomic }} XMR ({{ tx.confirmations }} confirmations)</li>
+{% endfor %}
+</ul>
+
+{% for payment in payments %}
+{{ payment }}
+{% endfor %}
+
+{% endblock %}

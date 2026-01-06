@@ -5,8 +5,6 @@ from flask_bcrypt import Bcrypt
 
 from lwsadmin import config
 
-
-
 db = SQLAlchemy()
 login_manager = LoginManager()
 bcrypt = Bcrypt()
@@ -25,7 +23,8 @@ def create_app():
     
     with app.app_context():
         from lwsadmin.models import User
-        from lwsadmin.routes import home, auth
+        from lwsadmin.routes import home, auth, account
+        from lwsadmin import filters
 
         @login_manager.user_loader
         def load_user(user_id: str):
@@ -34,4 +33,6 @@ def create_app():
         # from lwsadmin import filters, cli
         app.register_blueprint(home.bp)
         app.register_blueprint(auth.bp)
+        app.register_blueprint(account.bp)
+        app.register_blueprint(filters.bp)
         return app

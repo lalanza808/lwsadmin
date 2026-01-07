@@ -99,16 +99,24 @@ def account(address, view_key):
                 db.session.commit()
     
     payments = Payment.query.filter(Payment.account_id == account.id)
-    for p in payments:
-        print(f"price per block: {p.price_per_block}. amount sent: {p.amount}")
-        print(p.amount / p.price_per_block)
     
+    height = daemon.height()
+    total_sent = sum([p.amount for p in payments])
+    total_blocks_to_scan = sum([p.get_blocks_to_scan() for p in payments])
+    max_height = account.start_height + total_blocks_to_scan
+    print(f"""
+the current height is {height}
+this account started at height {account.start_height}
+{height - account.start_height} blocks have been mined since this account came online
+{total_sent} atomic xmr has been sent and is thus entitled to scan for {total_blocks_to_scan} total blocks
+the last block available for scanning will be {account.start_height + total_blocks_to_scan}
+the scanning will continue for {account.start_height + total_blocks_to_scan - height} more blocks
+    """)
+    if max_height > height:
+        print(f"the user has {max_height - height} blocks left to scan")
     return render_template(
         "pages/account.html",
-        address=account.payment_address,
-        view_key=account.view_key,
         qrcode=img_base64_string,
-        txes=txes,
         account=account,
         pending_txes=pending_txes,
         completed_txes=completed_txes,

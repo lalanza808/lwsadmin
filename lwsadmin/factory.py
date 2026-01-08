@@ -24,7 +24,7 @@ def create_app():
     with app.app_context():
         from lwsadmin.models import User
         from lwsadmin.routes import home, auth, account, api
-        from lwsadmin import filters
+        from lwsadmin import filters, cli
 
         @login_manager.user_loader
         def load_user(user_id: str):
@@ -36,4 +36,5 @@ def create_app():
         app.register_blueprint(auth.bp)
         app.register_blueprint(account.bp)
         app.register_blueprint(filters.bp)
+        app.register_blueprint(cli.bp)
         return app

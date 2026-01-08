@@ -21,7 +21,6 @@ from lwsadmin import config
 class LWS:
     def __init__(self, admin_key):
         self.admin_key = admin_key
-        pass
     
     def get_address_info(self, address, view_key):
         endpoint = f"{config.LWS_URL}/get_address_info"

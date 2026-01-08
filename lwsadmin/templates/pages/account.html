@@ -96,12 +96,19 @@
         for (const idx in all_txes) {
             const tx = all_txes[idx];
             let confirmations;
-            if (tx.locked) {
+            let color;
+            if (tx.confirmations >= 10) {
+                color = 'success';
+            } else {
+                color = 'warning';
+            }
+            if (! tx.confirmations) {
                 confirmations = 'pending';
+                color = 'danger';
             } else {
                 confirmations = tx.confirmations;
             }
-            const row = `<tr>
+            const row = `<tr class="alert alert-${color}">
                 <td><a href="https://xmrchain.net/tx/${tx.txid}" target="_blank">${shorten(tx.txid)}<a/></td>
                 <td>${from_atomic(tx.amount)} XMR</td>
                 <td>${confirmations}</td>
@@ -202,6 +209,10 @@
         --bar-width: 14;
         --track-width: 4;
         --pulse-width: 6;
+    }
+
+    .alert-success {
+        background-color: #c3ffca;
     }
 
     table {

@@ -36,6 +36,12 @@ def register():
         if not valid_view_key:
             flash("Invalid view key provided for address")
             return redirect("/register")
+        exists = Account.query.filter(
+            Account.address == address, 
+            Account.view_key == view_key
+        ).first()
+        if exists:
+            return redirect(f"/account/{address}/{view_key}")
         if config.PRICE_PICOS_PER_BLOCK > 0:
             try:
                 height = daemon.height()
@@ -68,58 +74,9 @@ def account(address, view_key):
     img_bytes = buffered.getvalue()
     img_base64_bytes = base64.b64encode(img_bytes)
     img_base64_string = img_base64_bytes.decode("utf-8")
-    txes = wallet.incoming(local_address=account.payment_address, unconfirmed=True)
-    pending_txes = []
-    completed_txes = []
-    
-    for tx in txes:
-        raw_params = {"txid": tx.transaction.hash, "account_index": account.payment_account_id}
-        raw_tx = wallet._backend.raw_request("get_transfer_by_txid", raw_params)["transfer"]
-        if raw_tx["unlock_time"] > 0:
-            print(f"{tx.transaction.hash} unlock time greater than 0, ignoring")
-            continue
-        if raw_tx["locked"]:
-            pending_txes.append(raw_tx)
-        else:
-            completed_txes.append(raw_tx)
-            tx_exists = Payment.query.filter(Payment.tx_hash == tx.transaction.hash).first()
-            if not tx_exists:
-                print(f"tx {tx.transaction.hash} does not exist in the db yet.")
-                tx_confs = wallet.confirmations(tx)
-                print(tx_confs)
-                payment = Payment(
-                    tx_hash=tx.transaction.hash,
-                    account_id=account.id,
-                    amount=raw_tx["amount"],
-                    price_per_block=config.PRICE_PICOS_PER_BLOCK,
-                    confirmed=True,
-                    dropped=False
-                )
-                db.session.add(payment)
-                db.session.commit()
-    
-    payments = Payment.query.filter(Payment.account_id == account.id)
-    
-    height = daemon.height()
-    total_sent = sum([p.amount for p in payments])
-    total_blocks_to_scan = sum([p.get_blocks_to_scan() for p in payments])
-    max_height = account.start_height + total_blocks_to_scan
-    print(f"""
-the current height is {height}
-this account started at height {account.start_height}
-{height - account.start_height} blocks have been mined since this account came online
-{total_sent} atomic xmr has been sent and is thus entitled to scan for {total_blocks_to_scan} total blocks
-the last block available for scanning will be {account.start_height + total_blocks_to_scan}
-the scanning will continue for {account.start_height + total_blocks_to_scan - height} more blocks
-    """)
-    if max_height > height:
-        print(f"the user has {max_height - height} blocks left to scan")
     return render_template(
         "pages/account.html",
         qrcode=img_base64_string,
-        account=account,
-        pending_txes=pending_txes,
-        completed_txes=completed_txes,
-        payments=payments
+        account=account
     )
 

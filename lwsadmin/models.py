@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from sqlalchemy import func
+from sqlalchemy.inspection import inspect
 
 from lwsadmin.factory import db
 
@@ -54,6 +55,9 @@ class Payment(db.Model):
     price_per_block = db.Column(db.BigInteger, unique=False)
     confirmed = db.Column(db.Boolean, unique=False, default=False)
     dropped = db.Column(db.Boolean, unique=False, default=False)
+
+    def as_json(self):
+        return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}
 
     def get_blocks_to_scan(self):
         return int(self.amount / self.price_per_block)

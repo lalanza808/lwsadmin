@@ -12,22 +12,58 @@
         To fund wallet scanning for 90 days (~{{ 720 * 90 }} blocks) it would cost ~{{ config.PRICE_PICOS_PER_BLOCK * 720 * 90 | atomic }} XMR.
     </p>
     <div id="qrcode"><img src="data:image/png;base64,{{ qrcode }}" width="200px"/></div>
-    <p>
-        Send funds to <span class="address">{{ account.payment_address }}</span>. 
-        Transactions will appear below.
-    </p>
+    <table id="deposit-table">
+        <tr>
+            <th>Deposit Address</th>
+        </tr>
+        <tr>
+            <td><span class="address">{{ account.payment_address }}</span></td>
+        </tr>
+    </table>
 </section>
 
-<section id="gauge">
-    <svg width="300" height="300" viewBox="0 0 400 400">
-        <circle class="track" cx="200" cy="200" r="180"></circle>
-        <circle class="progress-bar" id="progress-circle" cx="200" cy="200" r="180"></circle>
-        <circle class="pulse-ring" cx="200" cy="200" r="50"></circle>
-    </svg>
-    <div class="labels">
-        <p class="label-sub">Blocks Remaining</p>
-        <h1 class="block-count" id="remaining-text">?</h1>
+<section class="box">
+    <div>
+        <h2>Account Stats</h2>
+        <div class="row">
+            <div class="col">
+                <h4>Starting Height</h4>
+                <p>{{ account.start_height }}</p>
+            </div>
+            <div class="col">
+                <h4>Network Height</h4>
+                <p>
+                    <span id="network-height">?</span>
+                    <span id="height-diff" style="font-size:.8em"></span>
+                </p>
+            </div>
+            <div class="col">
+                <h4>XMR Sent</h4>
+                <p>
+                    <span id="xmr-sent">0</span> XMR
+                    <span id="txes-count"></span>
+                </p>
+            </div>
+            <div class="col">
+                <h4>Max Height</h4>
+                <p>
+                    <span id="max-height">?</span>
+                </p>
+            </div>
+        </div>
     </div>
+    <div id="gauge">
+        <svg width="300" height="300" viewBox="0 0 400 400">
+            <circle class="track" cx="200" cy="200" r="180"></circle>
+            <circle class="progress-bar" id="progress-circle" cx="200" cy="200" r="180"></circle>
+            <circle class="pulse-ring" cx="200" cy="200" r="50"></circle>
+        </svg>
+        <div class="labels">
+            <p class="label-sub">Blocks Remaining</p>
+            <h1 class="block-count" id="remaining-text">?</h1>
+        </div>
+    </div>
+    <div id="transactions"></div>
 </section>
 
 
@@ -39,89 +75,171 @@
 # the last block available for scanning will be {max_height}
 # the scanning will continue for {remaining_blocks} more blocks
 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-    <script>
-        async function updateDashboard() {
-            try {
-                const res = await fetch("/api/account/{{ account.address }}/{{ account.view_key }}");
-                const data = await res.json();
-                // current_height
-                // start_height
-                // total_xmr_sent
-                // total_blocks_to_scan
-                // max_height
-                // remaining_blocks
-                const progressRatio = Math.min(Math.max(data.remaining_blocks / data.total_blocks_to_scan, 0), 1);
-                const remainingBlocksText = document.getElementById('remaining-text').innerText;
-                const progressCircle = document.getElementById('progress-circle');
-                const circleLength = progressCircle.getTotalLength();
-                const offset = circleLength - (progressRatio * circleLength);
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+<script>
+    function from_atomic(picos) {
+        return Number(BigInt(picos)) / Number(BigInt(1e12));
+    }
+
+    function setVal(elId, val) {
+        document.getElementById(elId).innerText = val;
+    }
+
+    function shorten(s) {
+        return s.slice(0, 6) + '...' + s.slice(-6);
+    }
+
+    function updateTransactionsTable(txes) {
+        const all_txes = txes.pending.concat(txes.completed)
+        if (all_txes.length == 0) return
+        const rows = [];
+        for (const idx in all_txes) {
+            const tx = all_txes[idx];
+            let confirmations;
+            if (tx.locked) {
+                confirmations = 'pending';
+            } else {
+                confirmations = tx.confirmations;
+            }
+            const row = `<tr>
+                <td><a href="https://xmrchain.net/tx/${tx.txid}" target="_blank">${shorten(tx.txid)}<a/></td>
+                <td>${from_atomic(tx.amount)} XMR</td>
+                <td>${confirmations}</td>
+            </tr>`;
+            rows.push(row);
+        }
+        const table = `
+            <h2>Transactions</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>TX Hash</th>
+                        <th>Amount</th>
+                        <th>Confirmations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rows.join('')}
+                </tbody>
+            </table>`;
+        document.getElementById('transactions').innerHTML = table;
+    }
+
+    function updateAnime(target, value) {
+        anime({
+            targets: target,
+            innerText: [value],
+            round: 1,
+            duration: 2000,
+            easing: 'easeOutQuart'
+        });
+    }
+
+    async function updateDashboard() {
+        try {
+            // fetch stats
+            const res = await fetch("/api/account/{{ account.address }}/{{ account.view_key }}");
+            const data = await res.json();
+
+            // update values
+            updateAnime('#network-height', data.current_height);
+            updateAnime('#max-height', data.max_height);
+            updateAnime('#height-diff', `(${data.start_height - data.current_height} blocks)`)
+            setVal('xmr-sent', from_atomic(data.total_xmr_sent));
+
+            // show transactions
+            updateTransactionsTable(data.transactions);
+
+            // update gauge
+            const progressRatio = Math.min(Math.max(data.remaining_blocks / data.total_blocks_to_scan, 0), 1);
+            const remainingBlocksEl = document.getElementById('remaining-text');
+            const progressCircleEl = document.getElementById('progress-circle');
+            const circleLength = progressCircleEl.getTotalLength();
+            const offset = circleLength - (progressRatio * circleLength);
+            let remainingBlocks = data.remaining_blocks;
+            anime({
+                targets: progressCircleEl,
+                strokeDashArray: circleLength,
+                strokeDashoffset: [offset],
+                duration: 2000,
+                easing: 'easeOutQuart'
+            });
+            if (remainingBlocksEl.innerText != data.remaining_blocks) {
                 anime({
-                    targets: '#progress-circle',
-                    strokeDashArray: circleLength,
-                    strokeDashoffset: [offset],
+                    targets: remainingBlocksEl,
+                    innerText: [remainingBlocksEl.innerText, data.remaining_blocks],
+                    round: 1,
                     duration: 2000,
                     easing: 'easeOutQuart'
                 });
-                if (remainingBlocksText != data.remaining_blocks) {
-                    anime({
-                        targets: '#remaining-text',
-                        innerText: [remainingBlocksText, data.remaining_blocks],
-                        round: 1,
-                        duration: 2000,
-                        easing: 'easeOutQuart'
-                    });
-                }
-            } catch(err) {
-                console.log(err)
             }
+        } catch(err) {
+            console.log(err)
         }
-        anime({
-            targets: '.pulse-ring',
-            r: [20, 200],
-            opacity: [.5, 0],
-            duration: 4000,
-            easing: 'easeOutExpo',
-            loop: true
-        });
-        updateDashboard();
-        setInterval(updateDashboard, 30 * 1_000);
-    </script>
+    }
 
+    // heartbeat animation
+    anime({
+        targets: '.pulse-ring',
+        r: [20, 200],
+        opacity: [.75, 0],
+        duration: 3000,
+        easing: 'easeOutExpo',
+        loop: true
+    });
 
-<h2>Pending Transactions</h2>
-<ul>
-{% for tx in pending_txes %}
-<li><a href="https://xmrchain.net/tx/{{ tx.txid }}" target="_blank">{{ tx.txid | shorten }}</a> {{ tx.amount | atomic }} XMR ({{ tx.confirmations or 0 }} confirmations)</li>
-{% endfor %}
-</ul>
+    // run once
+    updateDashboard();
 
-<h2>Completed Transactions</h2>
-<ul>
-{% for tx in completed_txes %}
-<li><a href="https://xmrchain.net/tx/{{ tx.txid }}" target="_blank">{{ tx.txid | shorten }}</a> {{ tx.amount | atomic }} XMR ({{ tx.confirmations }} confirmations)</li>
-{% endfor %}
-</ul>
-
-{% for payment in payments %}
-{{ payment }}
-{% endfor %}
-
+    // run interval
+    setInterval(updateDashboard, 10 * 1_000);
+</script>
 <style>
     :root {
         --accent-color: #0a0e14;
         --secondary-color: #ff6600; /* Monero Orange */
         --text-color: #e0e0e0;
+        --bar-width: 14;
+        --track-width: 4;
+        --pulse-width: 6;
     }
+
+    table {
+        text-align: left;
+	    border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        border: 1px solid;
+        padding: 4px;
+    }
+
+    tr > th {
+        background-color: rgba(80, 80, 80, 0.35);
+    }
+
+    /* th, caption {
+        text-align: start;
+    }
+
+    thead th:not(:first-child), td {
+        text-align: end;
+    } */
 
     .address {
         user-select: all;
         word-wrap: anywhere;
-        background-color: RGBA(255, 102, 0, .35) ;
+        background-color: rgba(255, 102, 0, .35);
+        cursor: copy;
     }
 
     #qrcode {
         text-align: center;
+    }
+
+    #deposit-table {
+        margin: 0 auto;
     }
 
     #gauge {
@@ -142,13 +260,13 @@
     .track {
         fill: none;
         stroke: #1a2634;
-        stroke-width: 1;
+        stroke-width: var(--track-width);
     }
 
     .progress-bar {
         fill: none;
         stroke: var(--secondary-color);
-        stroke-width: 6;
+        stroke-width: var(--bar-width);
         stroke-linecap: round;
         stroke-dasharray: 1131; 
         stroke-dashoffset: 1131;
@@ -157,7 +275,7 @@
     .pulse-ring {
         fill: none;
         stroke: var(--accent-color);
-        stroke-width: 4;
+        stroke-width: var(--pulse-width);
         opacity: 0;
     }
 

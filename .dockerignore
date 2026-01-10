@@ -10,3 +10,5 @@ Makefile
 README.md
 .venv
 *.db
+*.pyc
+__pycache__

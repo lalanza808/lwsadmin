@@ -1,9 +1,13 @@
+import io
+import base64
+
+import qrcode
 import monero.seed
 from quart import Blueprint, redirect, request, flash, render_template
 from quart_auth import login_required
 
 from lws.models import User
-from lws.helpers import lws
+from lws.helpers import lws, get_tor_hostname
 from lws import config
 
 
@@ -15,9 +19,20 @@ bp = Blueprint("meta", "meta")
 async def index():
     admin = User.select().first()
     lws.init(admin.view_key)
+    tor_hostname = get_tor_hostname()
+    tor_url = f"http://{tor_hostname}:{config.LWS_RPC_PORT}"
+    img = qrcode.make(tor_url)
+    buffered = io.BytesIO()
+    img.save(buffered, format="png")
+    img_bytes = buffered.getvalue()
+    img_base64_bytes = base64.b64encode(img_bytes)
+    img_base64_string = img_base64_bytes.decode("utf-8")
+
     return await render_template(
         "index.html",
-        config=config
+        config=config,
+        qrcode=img_base64_string,
+        tor_url=tor_url
     )
 
 

@@ -5,62 +5,50 @@ x-log-config: &log-config
       max-size: "50m"
       max-file: "5"
 volumes:
-  lws:
+  monerolws:
   lwsadmin:
+  lwstor:
 services:
   lwsadmin:
     container_name: lwsadmin
     build:
       context: lwsadmin
       dockerfile: Dockerfile
-    # image: lalanza808/lwsadmin:latest
     restart: unless-stopped
     depends_on:
+      - tor
       - monero-lws
     environment:
-        LWS_URL: http://monero-lws:8080
-        LWS_ADMIN_URL: http://monero-lws:8081
-        QUART_ENV: production
-        HOST: 0.0.0.0
-        DEBUG: 0
-        SERVER_NAME: ${SERVER_NAME:-127.0.0.1:5000}
-        SECRET_KEY: ${SECRET_KEY:-thisisasecret}
+      LWS_URL: http://127.0.0.1:8080
+      LWS_ADMIN_URL: http://127.0.0.1:8081
+      QUART_ENV: production
+      HOST: 0.0.0.0
+      DEBUG: 0
+      SERVER_NAME: ${SERVER_NAME:-127.0.0.1:5000}
+      SECRET_KEY: ${SECRET_KEY:-thisisasecret}
     volumes:
       - lwsadmin:/srv/lwsadmin/data
-    user: "1000:1000"
-    command:
-      ./.venv/bin/poetry run start
-    ports:
-      - 127.0.0.1:5000:5000
+      - lwstor:/var/lib/tor:ro
+    network_mode: host
     <<: *log-config
   monero-lws:
     container_name: monero-lws
-    image: vtnerd/monero-lws
+    build:
+      context: lws
     restart: unless-stopped
-    depends_on:
-      - monerod
-    ports:
-      - 127.0.0.1:${REST_PORT:-8080}:8080
-      - 127.0.0.1:${ADMIN_PORT:-8081}:8081
+    network_mode: host
     volumes:
-      - lws:/home/monero-lws/.bitmonero/light_wallet_server
-    environment:
-      SCAN_THREADS: ${SCAN_THREADS:-4}
-      REST_THREADS: ${REST_THREADS:-2}
-      REST_PORT: 
-      ADMIN_PORT: ${ADMIN_PORT:-8081}
-      MAX_SUBADDRESS: ${MAX_SUBADDRESS:-200}
+      - monerolws:/home/monero-lws/.bitmonero/light_wallet_server
     command:
-      --scan-threads ${SCAN_THREADS} --rest-threads ${REST_THREADS} --rest-server http://0.0.0.0:8080 --admin-rest-server http://0.0.0.0:8081 --log-level 1 --daemon=tcp://monerod:18082 --sub=tcp://monerod:18083 --confirm-external-bind --access-control-origin "*" --max-subaddresses ${MAX_SUBADDRESS}
+      monero-lws-daemon --scan-threads ${SCAN_THREADS:-4} --rest-threads ${REST_THREADS:-2} --rest-server http://127.0.0.1:8080 --admin-rest-server http://127.0.0.1:8081 --log-level 1 --daemon=tcp://127.0.0.1:18082 --sub=tcp://127.0.0.1:18083 --access-control-origin "*" --max-subaddresses ${MAX_SUBADDRESS:-200}
     <<: *log-config
-  monerod:
-    container_name: monerod
-    image: lalanza808/monerod:latest
+  tor:
+    container_name: lwstor
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile-tor
     restart: unless-stopped
     volumes:
-      - ~/.bitmonero:/srv/monerod
-    ports:
-      - 127.0.0.1:18081:18081
-    command:
-      monerod --data-dir /srv/monerod/ --p2p-bind-ip=0.0.0.0 --p2p-bind-port=18080 --rpc-bind-ip=0.0.0.0 --rpc-bind-port=18081 --zmq-rpc-bind-ip=0.0.0.0 --zmq-rpc-bind-port=18082 --zmq-pub tcp://0.0.0.0:18083 --rpc-restricted-bind-ip=0.0.0.0 --rpc-restricted-bind-port=18089 --non-interactive --confirm-external-bind
+      - lwstor:/var/lib/tor/
+    network_mode: host
     <<: *log-config

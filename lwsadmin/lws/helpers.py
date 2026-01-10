@@ -1,7 +1,16 @@
+from pathlib import Path
+
 import requests
 
 from lws.models import User
 from lws import config
+
+def get_tor_hostname():
+    hostname_path = Path(config.TOR_HOSTNAME_PATH)
+    if not hostname_path.exists():
+        return ""
+    with open(hostname_path, "r") as f:
+        return f.read().strip()
 
 
 # accept_requests: {"type": "import"|"create", "addresses":[...]}

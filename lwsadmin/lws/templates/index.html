@@ -3,22 +3,35 @@
 {% block content %}
 
 <h1>Monero Lightwallet Server</h1>
-<p>LWS Admin: {{ config.LWS_ADMIN_URL }}</p>
-<p>LWS RPC: {{ config.LWS_URL }}</p>
-<p>Monero Web Wallet: <a href="{{ config.MYMONERO_URL }}" target="_blank">{{ config.MYMONERO_URL }}</a></p>
 
 <div>
-  <a hx-get="/htmx/import_wallet" hx-target="#walletForm" class="button primary outline">Import Wallet</a>
-  <a hx-get="/htmx/create_wallet" hx-target="#walletForm" class="button primary">Create Wallet</a>
+  <h2>Connecting</h2>
+  <p>Use an LWS compatible wallet to connect to the backend remotely:</p>
+  <ul>
+    <li><a href="https://www.monerujo.app/" target="_blank">Monerujo</a></li>
+    <li><a href="https://skylight.magicgrants.org/" target="_blank">Skylight</a></li>
+  </ul>
+  <p>If you want to connect a light wallet on your computer then you can use the following URL: <strong>{{ config.LWS_URL }}</strong></p>
+  {% if tor_url %}
+  <p>If you would like to connect remotely over Tor, use the following URL or use the QR Code: <strong>{{ tor_url }}</strong></p>
+  <img src="data:image/png;base64,{{ qrcode }}" width="120px" />
+  {% endif %}
+</div>
+
+<div>
+  <h2>LWS Admin</h2>
+  <p>You can create a new wallet here to import on your device or import it here. </p>
+  <a hx-get="/htmx/import_wallet" hx-target="#walletForm" class="button primary outline">Import Existing Wallet</a>
+  <a hx-get="/htmx/create_wallet" hx-target="#walletForm" class="button primary">Create New Wallet</a>
   <p id="walletForm" style="margin: 2em 0 2em 0"></p>
 </div>
 
 <div>
-  <h3>Accounts</h3>
+  <h2>Accounts</h2>
   <p>
-    The below Monero accounts are stored in LWS;
-    only active accounts will be synced. 
-    Accounts created in the web wallet must be approved here before use.
+    The below Monero accounts are stored and actively syncing in LWS.
+    If you setup your light wallet first then the account will show here to accept.
+    You can adjust labels and rescan when accounts are available.
   </p>
   <div hx-get="/htmx/show_wallets" hx-target="#show_wallets" class="button outline" hx-indicator="#refresh_loader" onclick="handleRefresh()">
     Refresh

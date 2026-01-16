@@ -16,6 +16,7 @@ FLASK_AUTH_DURATION = int(env.get("FLASK_AUTH_DURATION", 60 * 60))    # 1 hour
 # LWS API
 LWS_URL = env.get("LWS_URL", "http://127.0.0.1:8080")
 LWS_ADMIN_URL = env.get("LWS_ADMIN_URL", "http://127.0.0.1:8081")
+LWS_PUBLIC_URL = env.get("LWS_PUBLIC_URL", "https://lws.mydomain.com")
 
 # Monerod RPC
 MONEROD_PORT = 18081

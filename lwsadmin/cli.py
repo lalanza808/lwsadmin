@@ -11,14 +11,11 @@ bp = Blueprint('cli', 'cli')
 def debug():
     user = User.query.filter().first()
     lws = LWS(user.view_key)
-    print("accounts")
     accounts = lws.list_accounts()
     if 'hidden' in accounts:
         del accounts["hidden"]
-    print(accounts)
     requests = lws.list_requests()
     print(requests)
-    print()
     accounts = Account.query.filter()
     for account in accounts:
         payments = Payment.query.filter(Payment.account_id == account.id)
@@ -42,7 +39,7 @@ def debug():
                     lws.modify_wallet(account.address, 'inactive')
                     account.active = False
                     db.session.commit()
-                    print(f"account for address {account.address[-6:]} should not be marked as active")
+                    print(f"account for address {account.address[-6:]} deactived")
 
         # get_address_info
         # get_wallet

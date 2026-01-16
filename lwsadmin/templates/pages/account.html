@@ -45,6 +45,12 @@
                 </p>
             </div>
             <div class="col">
+                <h4>Blocks Purchased</h4>
+                <p>
+                    <span id="blocks-purchased">?</span>
+                </p>
+            </div>
+            <div class="col">
                 <h4>Max Height</h4>
                 <p>
                     <span id="max-height">?</span>
@@ -152,6 +158,7 @@
             updateAnime('#network-height', data.current_height);
             updateAnime('#max-height', data.max_height);
             updateAnime('#height-diff', `(${data.start_height - data.current_height} blocks)`)
+            updateAnime('#blocks-purchased', data.total_blocks_to_scan)
             setVal('xmr-sent', from_atomic(data.total_xmr_sent));
 
             // show transactions

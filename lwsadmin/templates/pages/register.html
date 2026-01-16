@@ -4,7 +4,8 @@
 <h1>Register</h1>
 <p>
     Enter in your wallet details below to register. 
-    Before your account will be activated you must pre-pay in XMR at the rate of {{config.PRICE_PICOS_PER_BLOCK}} piconeros ({{ config.PRICE_PICOS_PER_BLOCK }} XMR) per block.
+    Before your account will be activated you must pre-pay in XMR at the rate of {{config.PRICE_PICOS_PER_BLOCK}} piconeros ({{ config.PRICE_PICOS_PER_BLOCK | atomic }} XMR) per block.
+    To fund wallet scanning for 90 days (~{{ 720 * 90 }} blocks) it would cost ~{{ config.PRICE_PICOS_PER_BLOCK * 720 * 90 | atomic }} XMR.
     Payment details will be shown in the next form.
 </p>
 <div class="alert alert-danger">

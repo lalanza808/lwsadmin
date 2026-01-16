@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section>
+    <h1>Instructions</h1>
+    <div class="alert alert-danger">
+        <h3>Warning</h3>
+        <p>
+            This service works by scanning your XMR transactions on your behalf. It is convenient for quick and easy access to funds while on the go but at the detriment of privacy as the operator of this site will have insight into your incoming transfers; amounts included.
+        </p>
+        <p>
+            If your use case requires stringent security please run your own node and use another wallet or your own LWS deployment.
+        </p>
+    </div>
+    <div class="container">
+        <ol>
+            <li>Install <a href="https://skylight.magicgrants.org/" target="_blank">Skylight Wallet</a> on your mobile device or personal computer.</li>
+            <li>Start the creation of a new wallet using <code>{{ config.LWS_PUBLIC_URL }}</code> as your LWS server address.</li>
+            <li>Set a strong password</li>
+            <li>Create a new account and write down the mnemonic seed and restore height</li>
+            <li>Navigate to the <a href="/register">Registration</a> page</li>
+            <li>Input your wallet's primary address and secret/private view key</li>
+            <li>Make a payment to begin the process of scanning blocks for your wallet</li>
+        </ol>
+    </div>
+</section>
+{% endblock %}

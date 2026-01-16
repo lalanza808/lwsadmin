@@ -32,3 +32,6 @@ def home():
         requests=requests
     )
 
+@bp.route("/instructions")
+def instructions():
+    return render_template("pages/instructions.html")

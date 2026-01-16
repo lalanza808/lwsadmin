@@ -67,7 +67,10 @@ def register():
 
 @bp.route("/account/<address>/<view_key>", methods=["GET", "POST"])
 def account(address, view_key):
-    account = Account.query.filter(Account.address == address).first()
+    account = Account.query.filter(Account.address == address, Account.view_key == view_key).first()
+    if not account:
+        flash("Could not find this account")
+        return redirect("/")
     img = qrcode.make(f"monero:{account.payment_address}?tx_description='Funding blocks for LWS service'")
     buffered = io.BytesIO()
     img.save(buffered, format="png")
@@ -80,3 +83,35 @@ def account(address, view_key):
         account=account
     )
 
+@bp.route("/account", methods=["GET", "POST"])
+def login_account():
+    form = request.form
+    if form:
+        address = form.get("address", "")
+        view_key = form.get("view_key", "")
+        valid_view_key = False
+        if not address:
+            flash("You must provide a primary address")
+            return redirect("/account")
+        if not view_key:
+            flash("You must provide a private view key")
+            return redirect("/account")
+        try:
+            _a = MoneroAddress(address)
+            valid_view_key = _a.check_private_view_key(view_key)
+        except ValueError:
+            flash("Invalid Monero address")
+            return redirect("/account")
+        if not valid_view_key:
+            flash("Invalid view key provided for address")
+            return redirect("/account")
+        exists = Account.query.filter(
+            Account.address == address, 
+            Account.view_key == view_key
+        ).first()
+        if exists:
+            return redirect(f"/account/{address}/{view_key}")
+        else:
+            flash("This account does not exist, try registering")
+            return redirect("/register")
+    return render_template("pages/access.html")

@@ -1,8 +1,8 @@
+import json
 from pathlib import Path
 
 import requests
 
-from lws.models import User
 from lws import config
 
 def get_tor_hostname():
@@ -12,6 +12,13 @@ def get_tor_hostname():
     with open(hostname_path, "r") as f:
         return f.read().strip()
 
+def get_lws_keys():
+    try:
+        with open(config.LWS_KEY_PATH, "r") as f:
+            data = json.loads(f.read())
+            return data
+    except:
+        return None
 
 # accept_requests: {"type": "import"|"create", "addresses":[...]}
 # add_account: {"address": ..., "key": ...}
@@ -29,13 +36,7 @@ def get_tor_hostname():
 
 class LWS:
     def __init__(self):
-        pass
-
-    def init(self, admin_key):
-        self.admin_key = admin_key
-    
-    def _init(self):
-        self.admin_key = User.select().first().view_key
+        self.data = get_lws_keys()
     
     def get_address_info(self, address, view_key):
         endpoint = f"{config.LWS_URL}/get_address_info"
@@ -70,7 +71,7 @@ class LWS:
     
     def list_accounts(self) -> dict:
         endpoint = f"{config.LWS_ADMIN_URL}/list_accounts"
-        data = {"auth": self.admin_key}
+        data = {"auth": self.data["key"]}
         try:
             req = requests.post(endpoint, json=data, timeout=5)
             req.raise_for_status()
@@ -83,7 +84,7 @@ class LWS:
     
     def list_requests(self) -> dict:
         endpoint = f"{config.LWS_ADMIN_URL}/list_requests"
-        data = {"auth": self.admin_key}
+        data = {"auth": self.data["key"]}
         try:
             req = requests.post(endpoint, json=data, timeout=5)
             req.raise_for_status()
@@ -113,7 +114,7 @@ class LWS:
     def add_wallet(self, address: str, view_key: str) -> dict:
         endpoint = f"{config.LWS_ADMIN_URL}/add_account"
         data = {
-            "auth": self.admin_key, 
+            "auth": self.data["key"], 
             "params": {
                 "address": address, 
                 "key": view_key
@@ -132,7 +133,7 @@ class LWS:
     def modify_wallet(self, address: str, status: str) -> dict:
         endpoint = f"{config.LWS_ADMIN_URL}/modify_account_status"
         data = {
-            "auth": self.admin_key, 
+            "auth": self.data["key"], 
             "params": {
                 "addresses": [address], 
                 "status": status
@@ -151,7 +152,7 @@ class LWS:
     def accept_request(self, address: str, req_type: str="create") -> dict:
         endpoint = f"{config.LWS_ADMIN_URL}/accept_requests"
         data = {
-            "auth": self.admin_key, 
+            "auth": self.data["key"], 
             "params": {
                 "addresses": [address], 
                 "type": req_type
@@ -170,7 +171,7 @@ class LWS:
     def reject_request(self, address: str, req_type: str="create") -> dict:
         endpoint = f"{config.LWS_ADMIN_URL}/reject_requests"
         data = {
-            "auth": self.admin_key, 
+            "auth": self.data["key"], 
             "params": {
                 "addresses": [address], 
                 "type": req_type
@@ -189,7 +190,7 @@ class LWS:
     def rescan(self, address: str, height: int) -> dict:
         endpoint = f"{config.LWS_ADMIN_URL}/rescan"
         data = {
-            "auth": self.admin_key, 
+            "auth": self.data["key"], 
             "params": {
                 "addresses": [address], 
                 "height": height

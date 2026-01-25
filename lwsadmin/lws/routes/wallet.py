@@ -3,7 +3,7 @@ from monero.seed import Seed
 from quart import Blueprint, request, flash, redirect, url_for
 from quart_auth import login_required
 
-from lws.helpers import lws
+from lws.helpers import LWS
 from lws.models import Wallet, get_random_words
 
 
@@ -23,9 +23,9 @@ async def add():
         except ValueError:
             await flash("Invalid mnemonic seed")
             return ""
-        lws._init()
         address = str(seed.public_address())
         svk = str(seed.secret_view_key())
+        lws = LWS()
         lws.add_wallet(address, svk)
         if restore_height != "-1":
             lws.rescan(address, int(restore_height))
@@ -40,6 +40,7 @@ async def add():
 @bp.route("/wallet/<address>/rescan/<height>")
 @login_required
 async def rescan(address, height):
+    lws = LWS()
     lws.rescan(address, int(height))
     return redirect(url_for("htmx.show_wallets"))
 
@@ -47,6 +48,7 @@ async def rescan(address, height):
 @bp.route("/wallet/<address>/modify/<status>")
 @login_required
 async def modify(address, status):
+    lws = LWS()
     lws.modify_wallet(address, status)
     return redirect(url_for("htmx.show_wallets"))
 
@@ -54,6 +56,7 @@ async def modify(address, status):
 @bp.route("/wallet/<address>/accept")
 @login_required
 async def accept(address):
+    lws = LWS()
     lws.accept_request(address)
     return redirect(url_for("htmx.show_wallets"))
 
@@ -61,6 +64,7 @@ async def accept(address):
 @bp.route("/wallet/<address>/reject")
 @login_required
 async def reject(address):
+    lws = LWS()
     lws.reject_request(address)
     return redirect(url_for("htmx.show_wallets"))
 

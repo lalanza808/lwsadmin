@@ -2,14 +2,14 @@ from quart import Blueprint, render_template, request
 from monero.seed import Seed
 from quart_auth import login_required
 
-from lws.models import User, Wallet
-from lws.helpers import lws
-from lws import config
+from lws.models import Wallet
+from lws.helpers import LWS
 
 bp = Blueprint('htmx', 'htmx', url_prefix="/htmx")
 
 
 @bp.route("/create_wallet")
+@login_required
 async def create_wallet():
     """Creating a new wallet with newly generated seeds"""
     seed = Seed()
@@ -25,12 +25,14 @@ async def create_wallet():
 
 
 @bp.route("/import_wallet")
+@login_required
 async def import_wallet():
     """Importing an existing wallet"""
     return await render_template("htmx/import_wallet.html")
 
 
 @bp.route("/label_wallet")
+@login_required
 async def label_wallet():
     """Changing the label on a stored wallet"""
     address = request.args.get("address")
@@ -43,6 +45,7 @@ async def label_wallet():
 
 
 @bp.route("/set_height")
+@login_required
 async def set_height():
     """Setting a new height to scan from"""
     address = request.args.get("address")
@@ -58,10 +61,9 @@ async def set_height():
 @login_required
 async def show_wallets():
     """Showing all wallets in the database in a table"""
-    admin = User.select().first()
-    lws.init(admin.view_key)
+    lws = LWS()
     accounts = lws.list_accounts()
-    if 'hidden' in accounts:
+    if "hidden" in accounts:
         del accounts["hidden"]
     # save wallets if they don't exist in the db
     for status in accounts:
@@ -73,6 +75,9 @@ async def show_wallets():
                 )
                 w.save()
     requests = lws.list_requests()
+    print(requests)
+    if "import" in requests:
+        del requests["import"]
     return await render_template(
         "htmx/show_wallets.html",
         accounts=accounts,

@@ -5,10 +5,42 @@ x-log-config: &log-config
       max-size: "50m"
       max-file: "5"
 volumes:
-  monerolws:
+  lws:
+  lwsdata:
   lwsadmin:
   lwstor:
 services:
+  tor:
+    container_name: lwstor
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile-tor
+    restart: unless-stopped
+    volumes:
+      - lwstor:/var/lib/tor/
+    network_mode: host
+    <<: *log-config
+  lws:
+    container_name: lws
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile-lws
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - lws:/root/.bitmonero/light_wallet_server
+      - lwsdata:/data
+    environment:
+      SCAN_THREADS: 4
+      REST_THREADS: 2
+      REST_SERVER: http://127.0.0.1:8080
+      ADMIN_REST_SERVER: http://127.0.0.1:8081
+      LOG_LEVEL: 1
+      DAEMON_ZMQ_PUB: tcp://127.0.0.1:18082
+      DAEMON_ZMQ_SUB: tcp://127.0.0.1:18083
+      CORS: "*"
+      MAX_SUBADDRESS: 200
+    <<: *log-config
   lwsadmin:
     container_name: lwsadmin
     build:
@@ -17,7 +49,7 @@ services:
     restart: unless-stopped
     depends_on:
       - tor
-      - monero-lws
+      - lws
     environment:
       LWS_URL: http://127.0.0.1:8080
       LWS_ADMIN_URL: http://127.0.0.1:8081
@@ -29,26 +61,6 @@ services:
     volumes:
       - lwsadmin:/srv/lwsadmin/data
       - lwstor:/var/lib/tor:ro
-    network_mode: host
-    <<: *log-config
-  monero-lws:
-    container_name: monero-lws
-    build:
-      context: lws
-    restart: unless-stopped
-    network_mode: host
-    volumes:
-      - monerolws:/home/monero-lws/.bitmonero/light_wallet_server
-    command:
-      monero-lws-daemon --scan-threads ${SCAN_THREADS:-4} --rest-threads ${REST_THREADS:-2} --rest-server http://127.0.0.1:8080 --admin-rest-server http://127.0.0.1:8081 --log-level 1 --daemon=tcp://127.0.0.1:18082 --sub=tcp://127.0.0.1:18083 --access-control-origin "*" --max-subaddresses ${MAX_SUBADDRESS:-200}
-    <<: *log-config
-  tor:
-    container_name: lwstor
-    build:
-      context: .
-      dockerfile: dockerfiles/Dockerfile-tor
-    restart: unless-stopped
-    volumes:
-      - lwstor:/var/lib/tor/
+      - lwsdata:/data:ro
     network_mode: host
     <<: *log-config

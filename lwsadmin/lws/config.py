@@ -19,6 +19,7 @@ LWS_RPC_PORT = env.get("LWS_RPC_PORT", 8080)
 LWS_ADMIN_RPC_PORT = env.get("LWS_ADMIN_RPC_PORT", 8081)
 LWS_URL = env.get("LWS_URL", f"http://127.0.0.1:{LWS_RPC_PORT}")
 LWS_ADMIN_URL = env.get("LWS_ADMIN_URL", f"http://127.0.0.1:{LWS_ADMIN_RPC_PORT}")
+LWS_KEY_PATH = env.get("LWS_KEY_PATH", "/data/credentials.json")
 
 # Tor hostname
 TOR_HOSTNAME_PATH = env.get("TOR_HOSTNAME_PATH", "/var/lib/tor/lws/hostname")

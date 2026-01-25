@@ -45,6 +45,9 @@ def register():
             try:
                 height = daemon.height()
                 new_address = generate_address()
+                if not new_address:
+                    flash("There was an error generating an address")
+                    return redirect("/register")
                 account = Account(
                     address=address,
                     view_key=view_key,

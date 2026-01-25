@@ -47,6 +47,9 @@ DB_URI = "postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}".format(
 CACHE_HOST = env.get("CACHE_HOST", "localhost")
 CACHE_PORT = env.get("CACHE_PORT", 6379)
 
+# Tor
+TOR_HOSTNAME_PATH = env.get("TOR_HOSTNAME_PATH", "/var/lib/tor/lws/hostname")
+
 # App
 THEME = env.get("THEME", "light")
 PRICE_PICOS_PER_BLOCK = int(env.get("PRICE_PICOS_PER_BLOCK", 500_000))

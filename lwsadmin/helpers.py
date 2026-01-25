@@ -34,3 +34,9 @@ def generate_address() -> None|Address:
         else:
             return new_address
 
+def get_tor_hostname() -> None|str:
+    try:
+        with open(config.TOR_HOSTNAME_PATH, "r") as f:
+            return f.read()
+    except:
+        return None

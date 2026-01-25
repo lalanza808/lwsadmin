@@ -9,10 +9,7 @@ volumes:
   lwsadmin:
   postgres:
   wallet:
-networks:
-  tor_net:
-    external: true
-    name: docker-monero-node_tor_net
+  tor:
 services:
   db:
     image: postgres:13
@@ -51,6 +48,16 @@ services:
       - wallet:/data
     command:
       bash /run_wallet.sh
+    <<: *log-config
+  tor:
+    container_name: lwstor
+    network_mode: host
+    build:
+      context: tor
+    restart: unless-stopped
+    volumes:
+      - tor:/var/lib/tor/
+    <<: *log-config
   # lwsadmin:
   #   container_name: lwsadmin
   #   build:
@@ -70,6 +77,7 @@ services:
   #       SECRET_KEY: ${SECRET_KEY:-thisisasecret}
   #   volumes:
   #     - lwsadmin:/srv/lwsadmin/data
+  #     - lwstor:/var/lib/tor:ro
   #   user: "1000:1000"
   #   command:
   #     ./.venv/bin/poetry run start

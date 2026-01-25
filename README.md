@@ -5,6 +5,11 @@ A personal Monero light-wallet service, allowing an always-on, immediate use wal
 * `monero-lws` by [vtnerd](https://github.com/vtnerd/monero-lws) - scans your wallet's view keys in the background
 * `lwsadmin` by [lza_menace](https://github.com/lalanza808) - backend CRUD app for managing the LWS backend
 
+The light-wallet compatible options are:
+
+* [Skylight](https://skylight.magicgrants.org/) (what i use)
+* [Edge](https://edge.app/monero-wallet/)
+
 ## Running
 
 The stack does not include `monerod` which is required. You will need to run that separately; I use [docker-monero-node](https://github.com/lalanza808/docker-monero-node/).

@@ -2,12 +2,11 @@ import io
 import base64
 
 from monero.address import Address as MoneroAddress
-from monero.numbers import to_atomic
 from flask import Blueprint, render_template, request, flash, redirect
 
 import qrcode
-from lwsadmin.helpers import daemon, wallet
-from lwsadmin.models import db, Account, Payment
+from lwsadmin.helpers import daemon, wallet, generate_address
+from lwsadmin.models import db, Account
 from lwsadmin import config
 
 
@@ -45,7 +44,7 @@ def register():
         if config.PRICE_PICOS_PER_BLOCK > 0:
             try:
                 height = daemon.height()
-                new_address = wallet.new_address(label=address)
+                new_address = generate_address()
                 account = Account(
                     address=address,
                     view_key=view_key,

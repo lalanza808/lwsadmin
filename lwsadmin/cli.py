@@ -1,14 +1,26 @@
+from monero.seed import Seed
 from flask import Blueprint
 
 from lwsadmin.library.lws import LWS
-from lwsadmin.helpers import daemon
+from lwsadmin.helpers import daemon, wallet
 from lwsadmin.models import db, Account, Payment, User
 
 bp = Blueprint('cli', 'cli')
 
 
-@bp.cli.command("debug")
-def debug():
+@bp.cli.command("generate")
+def generate():
+    seed = Seed()
+    height = daemon.height()
+    print("\n".join([
+        f"Seed Phrase: {seed.phrase}",
+        f"Primary Address: {seed.public_address()}",
+        f"Secret View Key: {seed.secret_view_key()}",
+        f"Restore Height: {height}"
+    ]))
+
+@bp.cli.command("scan")
+def scan():
     user = User.query.filter().first()
     lws = LWS(user.view_key)
     accounts = lws.list_accounts()

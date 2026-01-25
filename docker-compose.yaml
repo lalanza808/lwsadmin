@@ -26,24 +26,31 @@ services:
       POSTGRES_USER: ${DB_USER:-lwsadmin}
       POSTGRES_DB: ${DB_NAME:-lwsadmin}
     <<: *log-config
-  cache:
-    image: redis:latest
-    container_name: monero-lws-cache
-    ports:
-      - 127.0.0.1:6379:6379
-    <<: *log-config
+  # cache:
+  #   image: redis:latest
+  #   container_name: monero-lws-cache
+  #   ports:
+  #     - 127.0.0.1:6379:6379
+  #   <<: *log-config
   wallet:
     build:
       context: wallet
     network_mode: host
     container_name: monero-lws-wallet
     restart: always
-    ports:
-      - 127.0.0.1:${WALLET_RPC_PORT:-8000}:${WALLET_RPC_PORT:-8000}
+    environment:
+      WALLET_RPC_USERNAME: ${WALLET_RPC_USERNAME}
+      WALLET_RPC_PASSWORD: ${WALLET_RPC_PASSWORD}
+      WALLET_RPC_PORT: ${WALLET_RPC_PORT}
+      WALLET_DAEMON_ADDRESS: ${WALLET_DAEMON_ADDRESS}
+      WALLET_RESTORE_HEIGHT: ${WALLET_RESTORE_HEIGHT}
+      WALLET_ADDRESS: ${WALLET_ADDRESS}
+      WALLET_VIEW_KEY: ${WALLET_VIEW_KEY}
+      WALLET_PASSWORD: ${WALLET_PASSWORD}
     volumes:
       - wallet:/data
     command:
-      bash /run_wallet.sh "rpcuser:rpcpass" "http://127.0.0.1:18081"
+      bash /run_wallet.sh
   # lwsadmin:
   #   container_name: lwsadmin
   #   build:

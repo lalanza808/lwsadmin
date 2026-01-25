@@ -33,15 +33,15 @@ services:
       - lws:/root/.bitmonero/light_wallet_server
       - lwsdata:/data
     environment:
-      SCAN_THREADS: 4
-      REST_THREADS: 2
+      SCAN_THREADS: 24
+      REST_THREADS: 8
       REST_SERVER: http://127.0.0.1:8080
       ADMIN_REST_SERVER: http://127.0.0.1:8081
       LOG_LEVEL: 1
       DAEMON_ZMQ_PUB: tcp://127.0.0.1:18082
       DAEMON_ZMQ_SUB: tcp://127.0.0.1:18083
       CORS: "*"
-      MAX_SUBADDRESS: 200
+      MAX_SUBADDRESS: 20000
     <<: *log-config
   lwsadmin:
     container_name: lwsadmin

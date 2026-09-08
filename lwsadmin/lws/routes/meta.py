@@ -29,7 +29,7 @@ async def index():
     if tor_hostname:
         tor_url = f"http://{tor_hostname}:{config.LWS_RPC_PORT}"
         tor_qr = make_qr_base64(tor_url)
-    clearnet_qr = make_qr_base64(config.LWS_URL)
+    clearnet_qr = make_qr_base64(config.LWS_EXTERNAL_URL)
     return await render_template(
         "index.html",
         config=config,

@@ -58,6 +58,8 @@ services:
       DEBUG: 0
       SERVER_NAME: ${SERVER_NAME:-127.0.0.1:5000}
       SECRET_KEY: ${SECRET_KEY:-thisisasecret}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      LWS_EXTERNAL_URL: ${LWS_EXTERNAL_URL:-http://127.0.0.1:8080}
     volumes:
       - lwsadmin:/srv/lwsadmin/data
       - lwstor:/var/lib/tor:ro

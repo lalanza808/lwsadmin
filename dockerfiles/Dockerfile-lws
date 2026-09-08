@@ -6,7 +6,7 @@ RUN git clone https://github.com/vtnerd/monero-lws/ /monero-lws
 
 WORKDIR /monero-lws/build
 
-RUN git checkout f2b353400280f5219de5a90856d7f3814a84eb84 && \
+RUN git checkout fbfdca443260a7afe7009f1fa021d84b679e094b && \
   git submodule update --init --recursive
 
 RUN cmake -DCMAKE_BUILD_TYPE=Release ../

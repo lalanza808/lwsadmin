@@ -15,8 +15,6 @@ Everything is stored server side, encrypted in a SQLite database `lws.db`.
 ## Setup
 
 ```
-python3 -m venv .venv
-.venv/bin/pip install poetry
-poetry install
-poetry run start
+uv sync
+uv run start
 ```

@@ -1,12 +1,12 @@
 setup:
-	python3 -m venv .venv
-	.venv/bin/pip install -r requirements.txt
+	uv sync
+	mkdir data
 
 run:
-	.venv/bin/poetry run start
+	uv run start
 
 clean:
-	rm -rf .venv poetry.lock
+	rm -rf .venv uv.lock
 
 shell:
-	.venv/bin/python3
+	uv run python3

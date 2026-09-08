@@ -1,25 +1,27 @@
-[tool.poetry]
+[project]
 name = "lws-web"
 version = "0.1.0"
 description = ""
-authors = ["lza_menace <lza_menace@protonmail.com>"]
+authors = [{name = "lza_menace", email = "lza_menace@protonmail.com"}]
 readme = "README.md"
-packages = [{include = "lws", from = "."}]
+requires-python = ">=3.10"
+dependencies = [
+    "quart>=0.18.3,<0.20",
+    "peewee>=3.15.3",
+    "quart-auth>=0.8.0,<0.9",
+    "quart-bcrypt>=0.0.6,<0.1",
+    "requests>=2.29.0",
+    "monero>=1.1.1",
+    "python-dotenv>=1.0.0",
+    "qrcode>=8.2",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-quart = "^0.18.3"
-peewee = "^3.15.3"
-quart-auth = "^0.8.0"
-quart-bcrypt = "^0.0.6"
-requests = "^2.29.0"
-monero = "^1.1.1"
-python-dotenv = "^1.0.0"
-
+[project.scripts]
+start = "lws:run"
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry.scripts]
-start = "lws.app:run()"
+[tool.hatch.build.targets.wheel]
+packages = ["lws"]

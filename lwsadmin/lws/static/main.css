@@ -54,3 +54,53 @@ input {
         opacity: 1;
     }
 }
+
+.section {
+    margin: 2em 0;
+}
+
+.dropdown-card {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 1.25em;
+    padding: 0 1.25em;
+}
+
+.dropdown-card[open] {
+    padding-bottom: 1.25em;
+}
+
+.dropdown-card summary {
+    cursor: pointer;
+    padding: 0.75em 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.dropdown-card summary::-webkit-details-marker {
+    display: none;
+}
+
+.dropdown-card summary::before {
+    content: "\f054";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 0.75em;
+    transition: transform 0.2s ease;
+}
+
+.dropdown-card[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+.dropdown-card summary h3 {
+    margin: 0;
+    display: inline;
+}
+
+.dropdown-card ol li,
+.dropdown-card ul li {
+    margin-bottom: 0.75em;
+}

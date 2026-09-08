@@ -10,25 +10,18 @@ db = SqliteDatabase("data/lws.db")
 
 def get_random_words():
     e = English().word_list
-    return f"{choice(e)}-{choice(e)}-{choice(e)}"
-
-
-class User(Model):
-    username = CharField()
-    password = CharField()
-    date = DateTimeField(default=datetime.utcnow)
-
-    class Meta:
-        database = db
+    return f"{choice(e)}-{choice(e)}-{choice(e)}-{choice(e)}"
 
 
 class Wallet(Model):
-    date = DateTimeField(default=datetime.utcnow)
-    address = CharField()
+    email_address = CharField(null=False)
+    public_address = CharField(null=False, unique=True)
+    secret_view_key = CharField(null=False)
     label = CharField(default=get_random_words, null=False)
+    date = DateTimeField(default=datetime.utcnow)
 
     class Meta:
         database = db
 
 
-db.create_tables([User, Wallet])
+db.create_tables([Wallet])

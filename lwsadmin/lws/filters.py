@@ -18,8 +18,16 @@ def shorten(s):
 
 @bp.app_template_filter('find_label')
 def find_label(s):
-    w = Wallet.select().where(Wallet.address == s).first()
+    w = Wallet.select().where(Wallet.public_address == s).first()
     if w:
         return w.label
     else:
         return get_random_words()
+
+@bp.app_template_filter('find_email')
+def find_email(s):
+    w = Wallet.select().where(Wallet.public_address == s).first()
+    if w:
+        return w.email_address
+    else:
+        return "?"

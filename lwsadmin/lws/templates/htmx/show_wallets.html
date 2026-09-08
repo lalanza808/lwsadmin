@@ -2,6 +2,7 @@
     <thead>
       <tr>
         <th>Label</th>
+        <th>Email</th>
         <th>Status</th>
         <th>Action</th>
         <th>Address</th>
@@ -12,6 +13,7 @@
       {% for status in requests %}
         {% for request in requests[status] %}
         <tr>
+          <td>?</td>
           <td>?</td>
           <td>
             <span class="tag text-grey">
@@ -35,6 +37,7 @@
               <span class="underline">{{ account['address'] | find_label }}</span> <i class="fa-regular fa-pen-to-square"></i>
             </div>
           </td>
+          <td>{{ account['address'] | find_email }}</td>
           <td>
             <span class="tag {% if status == 'active' %}text-primary{% else %}text-error{% endif %}">
               {{ status | capitalize }}
@@ -60,4 +63,3 @@
       {% endfor %}
     </tbody>
 </table>
-

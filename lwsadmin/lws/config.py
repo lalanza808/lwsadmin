@@ -14,6 +14,9 @@ SECRET_KEY = env.get("SECRET_KEY", token_urlsafe(12))
 SERVER_NAME = env.get("SERVER_NAME", f"127.0.0.1:{PORT}")
 QUART_AUTH_DURATION = int(env.get('QUART_AUTH_DURATION', 60 * 60))    # 1 hour
 
+# Admin password for the web admin panel
+ADMIN_PASSWORD = env.get("ADMIN_PASSWORD", "")
+
 # LWS
 LWS_RPC_PORT = env.get("LWS_RPC_PORT", 8080)
 LWS_ADMIN_RPC_PORT = env.get("LWS_ADMIN_RPC_PORT", 8081)

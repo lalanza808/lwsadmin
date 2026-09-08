@@ -2,57 +2,56 @@ import io
 import base64
 
 import qrcode
-import monero.seed
-from quart import Blueprint, redirect, request, flash, render_template
+from quart import Blueprint, render_template
 from quart_auth import login_required
 
-from lws.helpers import get_tor_hostname
+from lws.helpers import get_tor_hostname, LWS
 from lws import config
+
+
+def make_qr_base64(data: str) -> str:
+    """Generate a base64-encoded PNG QR code for the given string."""
+    img = qrcode.make(data)
+    buffered = io.BytesIO()
+    img.save(buffered, format="png")
+    return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
 
 bp = Blueprint("meta", "meta")
 
 
 @bp.route("/")
-@login_required
 async def index():
+    """Public landing page with connection info and link to register."""
     tor_hostname = get_tor_hostname()
-    tor_url = f"http://{tor_hostname}:{config.LWS_RPC_PORT}"
-    img = qrcode.make(tor_url)
-    buffered = io.BytesIO()
-    img.save(buffered, format="png")
-    img_bytes = buffered.getvalue()
-    img_base64_bytes = base64.b64encode(img_bytes)
-    img_base64_string = img_base64_bytes.decode("utf-8")
+    tor_url = ""
+    tor_qr = ""
+    if tor_hostname:
+        tor_url = f"http://{tor_hostname}:{config.LWS_RPC_PORT}"
+        tor_qr = make_qr_base64(tor_url)
+    clearnet_qr = make_qr_base64(config.LWS_URL)
     return await render_template(
         "index.html",
         config=config,
-        qrcode=img_base64_string,
-        tor_url=tor_url
+        tor_qr=tor_qr,
+        clearnet_qr=clearnet_qr,
+        tor_url=tor_url,
     )
 
 
-@bp.route("/utils")
-async def utils():
-    return await render_template("utils/index.html")
-
-
-@bp.route("/utils/mnemonic", methods=["GET", "POST"])
-async def utils_mnemonic():
-    form = await request.form
-    if form:
-        seed = form.get("seed", "")
-        if not seed:
-            await flash("must provide mnemonic seed")
-            return redirect("/utils/mnemonic")
-        try:
-            s = monero.seed.Seed(seed)
-            return await render_template(
-                "utils/mnemonic.html",
-                results=s
-            )
-        except Exception as e:
-            print(f"failed to read mnemonic seed: {e}")
-            await flash("failed to parse mnemonic seed")
-    return await render_template("utils/mnemonic.html")
-
+@bp.route("/admin")
+@login_required
+async def admin():
+    """Admin dashboard for managing wallets. Requires login."""
+    tor_hostname = get_tor_hostname()
+    tor_url = ""
+    if tor_hostname:
+        tor_url = f"http://{tor_hostname}:{config.LWS_RPC_PORT}"
+    lws = LWS()
+    current_height = lws.get_current_height()
+    return await render_template(
+        "admin.html",
+        config=config,
+        tor_url=tor_url,
+        current_height=current_height
+    )

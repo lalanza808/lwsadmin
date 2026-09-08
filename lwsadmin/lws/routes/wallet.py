@@ -1,40 +1,11 @@
-import monero.address
-from monero.seed import Seed
-from quart import Blueprint, request, flash, redirect, url_for
+from quart import Blueprint, redirect, url_for
 from quart_auth import login_required
 
 from lws.helpers import LWS
-from lws.models import Wallet, get_random_words
+from lws.models import Wallet
 
 
 bp = Blueprint("wallet", "wallet")
-
-
-@bp.route("/wallet/add", methods=["GET", "POST"])
-@login_required
-async def add():
-    form = await request.form
-    if form:
-        label = form.get("label")
-        seed = form.get("seed")
-        restore_height = form.get("restore_height", None)
-        try:
-            seed = Seed(seed)
-        except ValueError:
-            await flash("Invalid mnemonic seed")
-            return ""
-        address = str(seed.public_address())
-        svk = str(seed.secret_view_key())
-        lws = LWS()
-        lws.add_wallet(address, svk)
-        if restore_height != "-1":
-            lws.rescan(address, int(restore_height))
-        w = Wallet(
-            address=seed.public_address(),
-            label=label if label else get_random_words()
-        )
-        w.save()
-    return redirect(url_for("htmx.show_wallets"))
 
 
 @bp.route("/wallet/<address>/rescan/<height>")
@@ -72,7 +43,7 @@ async def reject(address):
 @bp.route("/wallet/<address>/label/<label>")
 @login_required
 async def label(address, label):
-    w = Wallet.select().where(Wallet.address == address).first()
+    w = Wallet.select().where(Wallet.public_address == address).first()
     if w and label:
         w.label = label
         w.save()

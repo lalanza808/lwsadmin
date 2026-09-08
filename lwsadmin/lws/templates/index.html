@@ -2,57 +2,134 @@
 
 {% block content %}
 
-<h1>Monero Light-Wallet Server</h1>
+<h1>Community Monero Light-Wallet Server</h1>
 <p>
-  Welcome! This is your very own private Monero light-wallet service. 
-  Run this on your home computer or a virtual private server that you trust and get remote access to a Monero hot wallet with zero syncing for instant access to your funds from anywhere in the world.</p>
-<div>
-  <h2>Connecting</h2>
-  <p>To get started, download the <a href="https://skylight.magicgrants.org/" target="_blank">Skylight wallet</a> for mobile or desktop (or both).
-  <p>If you want to connect directly to the service use the following URL: <strong>{{ config.LWS_URL }}</strong></p>
-  {% if tor_url %}
-  <p>If you would like to connect over Tor use the following URL or copy it from the below QR Code: <strong>{{ tor_url }}</strong></p>
-  <img src="data:image/png;base64,{{ qrcode }}" width="120px" />
-  {% endif %}
-  <p>Enter the URL in the wallet and either setup a new wallet or restore an existing one. If you create the wallet in Skylight it will automatically show in the list below, just click refresh and click <strong>Accept</strong>. Set a helpful label for future reference.</p>
-  <p>You can also generate a fresh wallet using the buttons below and import that into Skylight.</p>
-</div>
+  Welcome to this community-operated Monero light-wallet service (LWS).
+  Connect a compatible wallet to get instant access to your Monero funds
+  from anywhere in the world. No full node required, no blockchain sync,
+  no waiting.
+</p>
 
-<div>
-  <h2>Accounts</h2>
-  <p>
-    The below Monero accounts are either requests to begin syncing or actively syncing in LWS.
-    If you setup your light wallet first then the account will show here to accept.
-    You can adjust labels and rescan when accounts are available.
-  </p>
-  <div hx-get="/htmx/show_wallets" hx-target="#show_wallets" class="button outline" hx-indicator="#refresh_loader" onclick="handleRefresh()">
-    Refresh
-    <i class="fa-solid fa-rotate-right indicator" id="refresh_loader"></i>
-  </div>
-  <div hx-trigger="load" hx-get="/htmx/show_wallets" id="show_wallets" onload=""></div>
+<div class="section">
+  <h2>Getting Started</h2>
+  <p>There are two ways to set up your wallet on this server. Pick whichever is easiest for you.</p>
+
+  <details class="dropdown-card">
+    <summary><h3>Option A: Register here first, then connect your wallet</h3></summary>
+    <ol>
+      <li>
+        <a href="/register"><strong>Register your wallet</strong></a> on this site.
+        You will need your <strong>public address</strong>, <strong>secret view key</strong>,
+        an <strong>email</strong> for contact, and a short <strong>label</strong>.
+      </li>
+      <li>
+        Download the <a href="https://skylight.magicgrants.org/" target="_blank">Skylight wallet</a>
+        (or any Monero light-wallet client).
+      </li>
+      <li>
+        In the wallet settings, enter the connection URL below to point it at this server.
+        Your wallet will be ready to use immediately.
+      </li>
+    </ol>
+  </details>
+
+  <details class="dropdown-card">
+    <summary><h3>Option B: Connect your wallet first, then register here</h3></summary>
+    <ol>
+      <li>
+        Download <a href="https://skylight.magicgrants.org/" target="_blank">Skylight</a> and
+        set the server URL to this LWS (see below).
+      </li>
+      <li>
+        Create or restore a wallet in Skylight. The server will see the connection but
+        <strong>will not begin scanning</strong> until you complete registration.
+      </li>
+      <li>
+        Come back here and <a href="/register"><strong>register your wallet</strong></a>
+        with the same public address. The server will automatically activate scanning for you.
+      </li>
+    </ol>
+  </details>
 </div>
 
 <hr>
 
-<div>
-  <h2>LWS Admin</h2>
-  <p>You can create a new wallet here to import on your device or import it here. </p>
-  <a hx-get="/htmx/import_wallet" hx-target="#walletForm" class="button primary outline">Import Existing Wallet</a>
-  <a hx-get="/htmx/create_wallet" hx-target="#walletForm" class="button primary">Create New Wallet</a>
-  <p id="walletForm" style="margin: 2em 0 2em 0"></p>
+<div class="section">
+  <h2>Connection URLs</h2>
+  <p>Use one of the URLs below in your wallet's server/daemon settings.</p>
+
+  {% if tor_url %}
+  <details class="dropdown-card" open>
+    <summary><h3>Tor (recommended)</h3></summary>
+    <p>
+      For the best privacy, connect over Tor. When you use the .onion address,
+      <strong>your connection is fully anonymous</strong>. The server operator cannot see
+      your IP address or identify who is using the service.
+      Skylight supports Tor natively, just paste this URL.
+    </p>
+    <p><strong>{{ tor_url }}</strong></p>
+    <img src="data:image/png;base64,{{ tor_qr }}" width="140px" alt="Tor connection QR code" />
+    <p class="subtext">Scan or copy the .onion URL above into your wallet.</p>
+  </details>
+  {% endif %}
+
+  <details class="dropdown-card"{% if not tor_url %} open{% endif %}>
+    <summary><h3>{% if tor_url %}Clearnet (direct){% else %}Connection URL{% endif %}</h3></summary>
+    <p>
+      {% if tor_url %}
+      If you cannot use Tor, you can connect directly. Note that when using the clearnet URL,
+      <strong>the server operator can see your source IP address</strong>.
+      If this is a concern for your threat model, use the Tor address above instead.
+      {% else %}
+      Point your wallet at this URL to connect.
+      {% endif %}
+    </p>
+    <p><strong>{{ config.LWS_URL }}</strong></p>
+    <img src="data:image/png;base64,{{ clearnet_qr }}" width="140px" alt="Clearnet connection QR code" />
+  </details>
 </div>
 
-<script>
-  function handleRefresh() {
-    const show_wallets = document.getElementById('show_wallets'); 
-    const loader = document.getElementById('refresh_loader');
-    loader.classList.add('fa-spin');
-    show_wallets.classList.add('showFade');
-    setTimeout(function() {
-      show_wallets.classList.remove('showFade');
-      loader.classList.remove('fa-spin');
-    }, 2000)
-  }
-</script>
+<hr>
+
+<div class="section">
+  <h2>Privacy and Trust</h2>
+  <p>
+    By using this service you are sharing your <strong>secret view key</strong> with the server operator.
+    This means the operator can see your incoming transactions, amounts, and when they occur.
+    The operator <strong>cannot</strong> spend your funds. Only the secret spend key (which is never shared) can do that.
+  </p>
+  <p>
+    Make sure this trade-off fits your threat model before registering.
+    If you need full privacy, run your own node or your own LWS instance instead.
+  </p>
+</div>
+
+<hr>
+
+<div class="section">
+  <h2>Important Notes</h2>
+  <ul>
+    <li>
+      <strong>New wallets only.</strong> This server scans from the current block height forward.
+      Restoring wallets from genesis (block 0) is not supported. If you have an existing wallet
+      with prior transaction history, those older transactions will not appear.
+    </li>
+    <li>
+      <strong>Registration is required.</strong> You must register through this site for your
+      wallet to be actively scanned. Simply connecting a light-wallet client is not enough.
+    </li>
+    <li>
+      <strong>Your view key is stored on this server.</strong> The LWS daemon needs your secret
+      view key to scan for incoming transactions on your behalf. Your spend key is never needed
+      and should never be shared.
+    </li>
+  </ul>
+</div>
+
+<hr>
+
+<div style="text-align: center; margin: 2.5em 0;">
+  <a href="/register" class="button primary">Register Your Wallet</a>
+</div>
 
 {% endblock %}

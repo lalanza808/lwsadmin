@@ -2,7 +2,6 @@ from quart import Quart, redirect, request
 from quart_auth import (
     AuthManager, Unauthorized
 )
-from quart_bcrypt import Bcrypt
 
 from lws import config
 
@@ -16,8 +15,7 @@ def create_app():
     app.config["QUART_AUTH_DURATION"] = config.QUART_AUTH_DURATION
     app.config["SERVER_NAME"] = config.SERVER_NAME
     AuthManager(app)
-    bcrypt = Bcrypt(app)
-    
+
     @app.before_serving
     async def startup():
         from lws.routes import auth, wallet, meta, htmx
@@ -30,11 +28,6 @@ def create_app():
 
     @app.errorhandler(Unauthorized)
     async def redirect_to_login(*_):
-        if request.path == "/":
-            return redirect(f"/login?next={request.path}")
-        else:
-            return f"<p>you need to authenticate first</p><a href=\"/login\">login</a>"
-    
+        return redirect(f"/login?next={request.path}")
+
     return app
-    
-bcrypt = Bcrypt(create_app())

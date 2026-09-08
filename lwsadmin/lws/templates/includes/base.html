@@ -1,23 +1,12 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-        <title>Monero LWS Web App</title>
+        <title>Community Monero LWS</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="shortcut icon" href="/static/images/favicon.ico" type="image/png">
-        <meta itemprop="name" content="MyThing app">
-        <meta itemprop="description" content="Monero LWS web app">
-        <meta itemprop="image" content="">
-        <meta property="og:url" content="">
-        <meta property="og:type" content="website">
-        <meta property="og:title" content="">
-        <meta property="og:description" content="Monero LWS web app">
-        <meta property="og:image" content="">
-        <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:title" content="">
-        <meta name="twitter:description" content="Monero LWS web app">
-        <meta name="twitter:image" content="">
-        <meta name="keywords" content="Wownero, Monero, crypto, wallet, explorer">
+        <meta itemprop="name" content="Community Monero LWS">
+        <meta itemprop="description" content="Community Monero light-wallet server">
         <link rel="stylesheet" href="/static/chota.css">
         <link rel="stylesheet" href="/static/main.css">
         <link rel="stylesheet" href="/static/fa/all.min.css">
@@ -27,16 +16,15 @@
 	<body>
 		<nav class="nav">
             <div class="nav-left">
+              <a class="brand" href="/">Community LWS</a>
               <a class="{% if request.path == '/' %}active{% endif %}" href="/">Home</a>
-              <a class="{% if request.path == '/utils' %}active{% endif %}" href="/utils">Utils</a>
+              <a class="{% if request.path == '/register' %}active{% endif %}" href="/register">Register Wallet</a>
             </div>
-            <!-- <div class="nav-center">
-              <a class="brand">
-                <img src="logo.svg" alt="">
-              </a>
-            </div> -->
             <div class="nav-right">
-                <a href="/logout">Logout</a>
+                {% if current_user.is_authenticated %}
+                    <a class="{% if request.path == '/admin' %}active{% endif %}" href="/admin">Admin</a>
+                    <a href="/logout">Logout</a>
+                {% endif %}
             </div>
         </nav>
         <div class="container">

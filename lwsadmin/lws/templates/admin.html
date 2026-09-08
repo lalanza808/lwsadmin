@@ -1,0 +1,40 @@
+{% extends 'includes/base.html' %}
+
+{% block content %}
+
+<h1>Admin Dashboard</h1>
+<p>Manage registered wallets and LWS scanning status.</p>
+
+{% if tor_url %}
+<p>Tor URL: <strong>{{ tor_url }}</strong></p>
+{% endif %}
+<p>Direct URL: <strong>{{ config.LWS_URL }}</strong></p>
+<p>Current scan height: <strong>{{ current_height }}</strong></p>
+
+<div>
+  <h2>Accounts</h2>
+  <p>
+    The below Monero accounts are either pending requests or actively scanning in LWS.
+    You can adjust labels, rescan heights, and activate/deactivate accounts.
+  </p>
+  <div hx-get="/htmx/show_wallets" hx-target="#show_wallets" class="button outline" hx-indicator="#refresh_loader" onclick="handleRefresh()">
+    Refresh
+    <i class="fa-solid fa-rotate-right indicator" id="refresh_loader"></i>
+  </div>
+  <div hx-trigger="load" hx-get="/htmx/show_wallets" id="show_wallets" onload=""></div>
+</div>
+
+<script>
+  function handleRefresh() {
+    const show_wallets = document.getElementById('show_wallets'); 
+    const loader = document.getElementById('refresh_loader');
+    loader.classList.add('fa-spin');
+    show_wallets.classList.add('showFade');
+    setTimeout(function() {
+      show_wallets.classList.remove('showFade');
+      loader.classList.remove('fa-spin');
+    }, 2000)
+  }
+</script>
+
+{% endblock %}

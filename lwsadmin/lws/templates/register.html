@@ -1,0 +1,32 @@
+{% extends 'includes/base.html' %}
+
+{% block content %}
+<h1>Register Your Wallet</h1>
+<p>
+  Provide your wallet details below to begin scanning from the current block height.
+  All fields are required. Your secret view key is stored to enable the light-wallet server to scan on your behalf.
+</p>
+<p class="subtext">
+  Only new wallets (scanning from current height) are supported.
+  Restoring from block height 0 is not available on this community server.
+</p>
+<form method="post">
+    <label for="email_address">Email Address</label>
+    <p class="subtext">Used for contact purposes only.</p>
+    <input type="email" name="email_address" required placeholder="you@example.com" />
+
+    <label for="public_address">Public Address</label>
+    <p class="subtext">Your Monero public address (starts with 4, 95 characters).</p>
+    <input type="text" name="public_address" required placeholder="4..." maxlength="200" />
+
+    <label for="secret_view_key">Secret View Key</label>
+    <p class="subtext">64 hex character secret view key. This allows the server to scan for your incoming transactions.</p>
+    <input type="password" name="secret_view_key" required placeholder="64 hex characters" maxlength="200" />
+
+    <label for="label">Label</label>
+    <p class="subtext">A short label to identify this wallet (max 80 characters).</p>
+    <input type="text" name="label" required placeholder="my daily wallet" maxlength="80" />
+
+    <button type="submit" class="button primary">Register</button>
+</form>
+{% endblock %}

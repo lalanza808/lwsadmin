@@ -1,0 +1,83 @@
+{% extends 'includes/base.html' %}
+
+{% block content %}
+<h1>About This Service</h1>
+<p>
+  This is a community-operated Monero light-wallet server (LWS). It allows you
+  to use a light wallet without running your own full node or syncing the entire
+  blockchain.
+</p>
+
+<hr>
+
+<div class="section">
+  <h2>Operator</h2>
+  <table>
+    <tbody>
+      <tr>
+        <th>Name / Handle</th>
+        <td>lza_mance</td>
+      </tr>
+      <tr>
+        <th>Contact</th>
+        <td><a href="mailto:lza_menace@protonmail.com">lza_menace@protonmail.com</a></td>
+      </tr>
+      <tr>
+        <th>Website</th>
+        <td><a href="https://github.com/lalanza808" target="_blank">github.com/lalanza808</a></td>
+      </tr>
+      <tr>
+        <th>PGP Key</th>
+        <td><a href="https://gist.github.com/lalanza808/9cf90dce66183ec7887f0bb656770079" target="_blank">lza_menace.asc</a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<hr>
+
+<div class="section">
+  <h2>Server Details</h2>
+  <table>
+    <tbody>
+      <tr>
+        <th>Software</th>
+        <td><a href="https://github.com/vtnerd/monero-lws" target="_blank">monero-lws</a></td>
+      </tr>
+      <tr>
+        <th>Admin Panel</th>
+        <td><a href="https://github.com/lalanza808/lwsadmin" target="_blank">lwsadmin</a></td>
+      </tr>
+      <tr>
+        <th>Network</th>
+        <td>Monero mainnet</td>
+      </tr>
+      <tr>
+        <th>Tor Support</th>
+        <td>Yes</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<hr>
+
+<div class="section">
+  <h2>Policies</h2>
+  <ul>
+    <li>
+      <strong>Data stored:</strong> Your public address, secret view key, email,
+      and a label you choose. No IP addresses or browsing data are logged.
+    </li>
+    <li>
+      <strong>Data retention:</strong> Your data is kept as long as your wallet
+      is registered. You can request removal by contacting the operator.
+    </li>
+    <li>
+      <strong>Availability:</strong> This is a community service provided on a
+      best-effort basis. There are no uptime guarantees.
+    </li>
+  </ul>
+</div>
+
+{% endblock %}

@@ -39,6 +39,12 @@ async def index():
     )
 
 
+@bp.route("/about")
+async def about():
+    """Public about page describing the service and its operator."""
+    return await render_template("about.html")
+
+
 @bp.route("/admin")
 @login_required
 async def admin():

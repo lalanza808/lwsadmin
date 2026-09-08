@@ -1,12 +1,234 @@
+/* ===================================================
+   Dark theme overrides (inspired by stasher.news)
+   Overrides chota.css custom properties
+   =================================================== */
+
+:root {
+    /* Core palette */
+    --bg-color: #1a1a1f;
+    --bg-secondary-color: #242429;
+    --color-primary: #FF6600;
+    --color-lightGrey: rgba(255, 255, 255, 0.12);
+    --color-grey: #a0a0a0;
+    --color-darkGrey: #f5f5f5;
+    --color-error: #c03221;
+    --color-success: #5c8001;
+    --font-color: #f5f5f5;
+    --font-size: 1.5rem;
+    --grid-maxWidth: 72rem;
+
+    /* Extended palette */
+    --surface: #1f1f24;
+    --surface-2: #242429;
+    --border: rgba(255, 255, 255, 0.12);
+    --text-muted: #a0a0a0;
+    --text-secondary: rgba(245, 245, 245, 0.85);
+    --link-color: #3da8e0;
+    --link-hover: #1a8ec9;
+    --accent: #FF6600;
+    --radius-sm: 10px;
+    --radius-md: 12px;
+}
+
+
+/* ===================================================
+   Base element overrides
+   =================================================== */
+
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif;
+    line-height: 1.75;
+    background-color: var(--bg-color);
+    color: var(--font-color);
+}
+
+a {
+    color: var(--link-color);
+}
+
+a:hover:not(.button) {
+    color: var(--link-hover);
+    opacity: 1;
+}
+
+strong {
+    color: #fff;
+}
+
+hr {
+    background-color: var(--border);
+    border: none;
+    height: 1px;
+    margin: 0.5em 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #fff;
+}
+
+p {
+    color: var(--text-secondary);
+    line-height: 1.75;
+}
+
+li {
+    color: var(--text-secondary);
+}
+
+
+/* ===================================================
+   Navigation
+   =================================================== */
+
+.nav {
+    background-color: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 0.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav a, .nav .brand {
+    color: rgba(255, 255, 255, 0.55);
+    font-weight: 500;
+    padding: 1rem 1.5rem;
+}
+
+.nav a:hover {
+    color: rgba(255, 255, 255, 0.75);
+    opacity: 1;
+}
+
+.nav .active:not(.button),
+.nav [aria-current=page]:not(.button) {
+    color: var(--accent);
+}
+
+.nav .brand {
+    color: #fff;
+    font-weight: 600;
+}
+
+
+/* ===================================================
+   Container
+   =================================================== */
+
+.container {
+    padding: 1rem 1.5rem;
+}
+
+
+/* ===================================================
+   Buttons
+   =================================================== */
+
+.button, [type=submit], button {
+    border-radius: 0.4rem;
+    font-weight: 600;
+    transition: background-color 0.15s ease, opacity 0.15s ease;
+}
+
+.button.primary, [type=submit] {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+}
+
+.button.primary:hover, [type=submit]:hover {
+    background-color: #e55c00;
+    border-color: #e55c00;
+    opacity: 1;
+}
+
+.button.outline {
+    background-color: transparent;
+    border-color: var(--text-muted);
+    color: var(--text-muted);
+}
+
+.button.outline:hover {
+    background-color: var(--text-muted);
+    color: #fff;
+}
+
+
+/* ===================================================
+   Forms / inputs
+   =================================================== */
+
+input, select, textarea {
+    display: block;
+    padding: 0.75em 1em;
+    margin-bottom: 1em;
+    background-color: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 0.4rem;
+    color: var(--font-color);
+    font-size: 0.93rem;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(255, 102, 0, 0.25);
+}
+
+input:disabled {
+    background-color: #2d2d2d;
+    color: var(--text-muted);
+}
+
+label {
+    font-size: 92%;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+
+/* ===================================================
+   Tables
+   =================================================== */
+
+table {
+    border-collapse: collapse;
+}
+
+thead {
+    border-bottom: 2px solid var(--border);
+}
+
+tfoot {
+    border-top: 2px solid var(--border);
+}
+
+td, th {
+    color: var(--text-secondary);
+}
+
+th {
+    color: #fff;
+}
+
+table.striped tr:nth-of-type(2n) {
+    background-color: var(--surface);
+}
+
+
+/* ===================================================
+   Utility classes
+   =================================================== */
+
 .key {
-    color: #666;
+    color: var(--text-muted);
     font-size: .9em;
     user-select: all;
 }
 
 .smol {
     font-size: .8em;
-    color: #666;
+    color: var(--text-muted);
 }
 
 .content {
@@ -14,27 +236,21 @@
 }
 
 .subtext {
-    font-size: 1em;
+    font-size: 0.9em;
     display: block;
-    color: #666;
-}
-
-input {
-    display: block;
-    padding-bottom: .5em;
-    margin-bottom: 1em;
+    color: var(--text-muted);
 }
 
 .hidden {
     display: none !important;
 }
 
-.indicator .htmx-request{
-    display:inline;
+.indicator .htmx-request {
+    display: inline;
 }
 
-.indicator.htmx-request{
-    display:inline;
+.indicator.htmx-request {
+    display: inline;
 }
 
 .underline {
@@ -47,21 +263,28 @@ input {
 }
 
 @keyframes render {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
+
+
+/* ===================================================
+   Sections
+   =================================================== */
 
 .section {
     margin: 2em 0;
 }
 
+
+/* ===================================================
+   Dropdown cards
+   =================================================== */
+
 .dropdown-card {
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
     margin-bottom: 1.25em;
     padding: 0 1.25em;
 }
@@ -72,7 +295,7 @@ input {
 
 .dropdown-card summary {
     cursor: pointer;
-    padding: 0.75em 0;
+    padding: 0.85em 0;
     list-style: none;
     display: flex;
     align-items: center;
@@ -88,7 +311,8 @@ input {
     font-family: "Font Awesome 6 Free";
     font-weight: 900;
     font-size: 0.75em;
-    transition: transform 0.2s ease;
+    color: var(--text-muted);
+    transition: transform 0.2s ease-in-out;
 }
 
 .dropdown-card[open] > summary::before {
@@ -98,9 +322,75 @@ input {
 .dropdown-card summary h3 {
     margin: 0;
     display: inline;
+    font-size: 1.3em;
 }
 
 .dropdown-card ol li,
 .dropdown-card ul li {
     margin-bottom: 0.75em;
+}
+
+
+/* ===================================================
+   Blockquote
+   =================================================== */
+
+blockquote {
+    background-color: var(--surface);
+    border-left: 3px solid var(--border);
+}
+
+
+/* ===================================================
+   Code blocks
+   =================================================== */
+
+code, kbd {
+    background-color: var(--surface-2);
+    color: var(--accent);
+}
+
+pre {
+    background-color: var(--surface) !important;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+
+/* ===================================================
+   Flash messages
+   =================================================== */
+
+.flash-messages li {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 0.4rem;
+    padding: 0.75em 1em;
+    margin-bottom: 0.5em;
+    list-style: none;
+    color: var(--font-color);
+}
+
+
+/* ===================================================
+   Scrollbar (subtle)
+   =================================================== */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
 }

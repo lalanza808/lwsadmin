@@ -1,6 +1,6 @@
 import re
 
-from quart import Blueprint, redirect, request, flash, render_template
+from quart import Blueprint, redirect, request, flash, render_template, session
 from quart_auth import login_user, AuthUser, current_user, logout_user
 
 from lws import config
@@ -129,10 +129,64 @@ async def register():
         )
         w.save()
 
+        # Store in session so the status page can show info after redirect
+        session["registered_address"] = public_address
+        session["registered_view_key"] = secret_view_key
+        session["registered_label"] = label
+        session["just_registered"] = True
+
         await flash(
             "wallet registered successfully! "
             "it will begin scanning from the current block height."
         )
-        return redirect("/")
+        return redirect("/wallet/lookup")
 
     return await render_template("register.html")
+
+
+@bp.route("/wallet/lookup", methods=["GET", "POST"])
+async def wallet_lookup():
+    address = ""
+    view_key = ""
+    label = ""
+    just_registered = False
+    info = None
+
+    form = await request.form
+    if form:
+        # Manual lookup via POST
+        address = form.get("public_address", "").strip()
+        view_key = form.get("secret_view_key", "").strip()
+    elif session.get("registered_address"):
+        # Redirect from registration
+        address = session.pop("registered_address", "")
+        view_key = session.pop("registered_view_key", "")
+        label = session.pop("registered_label", "")
+        just_registered = session.pop("just_registered", False)
+
+    if address and view_key:
+        # Look up the label from local DB if we don't already have it
+        if not label:
+            wallet = Wallet.select().where(
+                Wallet.public_address == address
+            ).first()
+            if wallet:
+                label = wallet.label
+
+        lws = LWS()
+        try:
+            info = lws.get_address_info(address, view_key)
+        except Exception:
+            await flash("failed to fetch wallet status from LWS")
+            info = None
+
+    return await render_template(
+        "wallet_status.html",
+        info=info,
+        address=address,
+        label=label,
+        just_registered=just_registered,
+        blockchain_height=info.get("blockchain_height", 0) if info else 0,
+        scan_height=info.get("scanned_block_height", 0) if info else 0,
+        start_height=info.get("start_height", 0) if info else 0,
+    )

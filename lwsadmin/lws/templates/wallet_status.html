@@ -1,0 +1,96 @@
+{% extends 'includes/base.html' %}
+
+{% block content %}
+{% if info %}
+
+<h1>Wallet Status</h1>
+{% if just_registered %}
+<p>
+  Your wallet has been registered and is now being scanned by the light-wallet server.
+  Below is the current sync status. It may take a few moments before data appears.
+</p>
+{% else %}
+<p>
+  Below is the current sync status for your wallet on this light-wallet server.
+</p>
+{% endif %}
+
+<div class="section">
+  <h2>Sync Status</h2>
+  <table>
+    <tbody>
+      <tr>
+        <th>Address</th>
+        <td class="key">{{ address | shorten }}</td>
+      </tr>
+      {% if label %}
+      <tr>
+        <th>Label</th>
+        <td>{{ label }}</td>
+      </tr>
+      {% endif %}
+      <tr>
+        <th>Status</th>
+        <td>
+          <strong style="color: var(--color-success);">Active</strong>
+        </td>
+      </tr>
+      <tr>
+        <th>Scan Height</th>
+        <td>{{ scan_height }}</td>
+      </tr>
+      <tr>
+        <th>Blockchain Height</th>
+        <td>{{ blockchain_height }}</td>
+      </tr>
+      <tr>
+        <th>Start Height</th>
+        <td>{{ start_height }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+{% if just_registered %}
+<div class="section">
+  <h2>What's Next?</h2>
+  <ul>
+    <li>
+      <strong>Connect your wallet.</strong> Open your Monero light-wallet client
+      and point it at this server's connection URL (see the <a href="/">home page</a>).
+    </li>
+    <li>
+      <strong>Scanning is in progress.</strong> The server is scanning the blockchain
+      from your start height. New incoming transactions will appear in your wallet
+      once the scan reaches them.
+    </li>
+  </ul>
+</div>
+{% endif %}
+
+<div style="text-align: center; margin: 2.5em 0;">
+  <a href="/wallet/lookup" class="button outline">Check Another Wallet</a>
+  <a href="/" class="button primary">Back to Home</a>
+</div>
+
+{% else %}
+
+<h1>Wallet Status</h1>
+<p>
+  Enter your wallet credentials to view its sync status on this light-wallet server.
+  Your view key is needed to authenticate with the server but is not stored by this page.
+</p>
+<form method="post">
+    <label for="public_address">Public Address</label>
+    <p class="subtext">Your Monero public address (starts with 4, 95 characters).</p>
+    <input type="text" name="public_address" required placeholder="4..." maxlength="200" />
+
+    <label for="secret_view_key">Secret View Key</label>
+    <p class="subtext">64 hex character secret view key. Used to authenticate with the LWS server.</p>
+    <input type="password" name="secret_view_key" required placeholder="64 hex characters" maxlength="200" />
+
+    <button type="submit" class="button primary">View Status</button>
+</form>
+
+{% endif %}
+{% endblock %}

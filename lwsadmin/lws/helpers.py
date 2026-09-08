@@ -38,6 +38,10 @@ def get_lws_keys():
 class LWS:
     def __init__(self):
         self.data = get_lws_keys()
+        if self.data is None:
+            print("[WARNING] LWS admin credentials not found or unreadable at "
+                  f"{config.LWS_KEY_PATH} - admin API calls will fail")
+            self.data = {"key": ""}
 
     def get_address_info(self, address, view_key):
         endpoint = f"{config.LWS_URL}/get_address_info"
@@ -146,8 +150,8 @@ class LWS:
 
     def list_accounts(self) -> dict:
         endpoint = f"{config.LWS_ADMIN_URL}/list_accounts"
-        data = {"auth": self.data["key"]}
         try:
+            data = {"auth": self.data["key"]}
             req = requests.post(endpoint, json=data, timeout=5)
             req.raise_for_status()
             if req.ok:
@@ -159,8 +163,8 @@ class LWS:
 
     def list_requests(self) -> dict:
         endpoint = f"{config.LWS_ADMIN_URL}/list_requests"
-        data = {"auth": self.data["key"]}
         try:
+            data = {"auth": self.data["key"]}
             req = requests.post(endpoint, json=data, timeout=5)
             req.raise_for_status()
             if req.ok:
@@ -188,14 +192,14 @@ class LWS:
 
     def add_wallet(self, address: str, view_key: str) -> dict:
         endpoint = f"{config.LWS_ADMIN_URL}/add_account"
-        data = {
-            "auth": self.data["key"],
-            "params": {
-                "address": address,
-                "key": view_key
-            }
-        }
         try:
+            data = {
+                "auth": self.data["key"],
+                "params": {
+                    "address": address,
+                    "key": view_key
+                }
+            }
             req = requests.post(endpoint, json=data, timeout=5)
             req.raise_for_status()
             if req.ok:
@@ -207,14 +211,14 @@ class LWS:
 
     def modify_wallet(self, address: str, status: str) -> dict:
         endpoint = f"{config.LWS_ADMIN_URL}/modify_account_status"
-        data = {
-            "auth": self.data["key"],
-            "params": {
-                "addresses": [address],
-                "status": status
-            }
-        }
         try:
+            data = {
+                "auth": self.data["key"],
+                "params": {
+                    "addresses": [address],
+                    "status": status
+                }
+            }
             req = requests.post(endpoint, json=data, timeout=5)
             req.raise_for_status()
             if req.ok:
@@ -226,14 +230,14 @@ class LWS:
 
     def accept_request(self, address: str, req_type: str="create") -> dict:
         endpoint = f"{config.LWS_ADMIN_URL}/accept_requests"
-        data = {
-            "auth": self.data["key"],
-            "params": {
-                "addresses": [address],
-                "type": req_type
-            }
-        }
         try:
+            data = {
+                "auth": self.data["key"],
+                "params": {
+                    "addresses": [address],
+                    "type": req_type
+                }
+            }
             req = requests.post(endpoint, json=data, timeout=5)
             req.raise_for_status()
             if req.ok:
@@ -245,14 +249,14 @@ class LWS:
 
     def reject_request(self, address: str, req_type: str="create") -> dict:
         endpoint = f"{config.LWS_ADMIN_URL}/reject_requests"
-        data = {
-            "auth": self.data["key"],
-            "params": {
-                "addresses": [address],
-                "type": req_type
-            }
-        }
         try:
+            data = {
+                "auth": self.data["key"],
+                "params": {
+                    "addresses": [address],
+                    "type": req_type
+                }
+            }
             req = requests.post(endpoint, json=data, timeout=5)
             req.raise_for_status()
             if req.ok:
@@ -264,14 +268,14 @@ class LWS:
 
     def rescan(self, address: str, height: int) -> dict:
         endpoint = f"{config.LWS_ADMIN_URL}/rescan"
-        data = {
-            "auth": self.data["key"],
-            "params": {
-                "addresses": [address],
-                "height": height
-            }
-        }
         try:
+            data = {
+                "auth": self.data["key"],
+                "params": {
+                    "addresses": [address],
+                    "height": height
+                }
+            }
             req = requests.post(endpoint, json=data, timeout=5)
             req.raise_for_status()
             if req.ok:
@@ -291,15 +295,15 @@ class LWS:
         Returns {"address": "..."} on success or {"error": {...}} on failure.
         """
         endpoint = f"{config.LWS_ADMIN_URL}/validate"
-        data = {
-            "auth": self.data["key"],
-            "params": {
-                "spend_public_hex": spend_public_hex,
-                "view_public_hex": view_public_hex,
-                "view_key_hex": view_key_hex
-            }
-        }
         try:
+            data = {
+                "auth": self.data["key"],
+                "params": {
+                    "spend_public_hex": spend_public_hex,
+                    "view_public_hex": view_public_hex,
+                    "view_key_hex": view_key_hex
+                }
+            }
             req = requests.post(endpoint, json=data, timeout=5)
             req.raise_for_status()
             if req.ok:

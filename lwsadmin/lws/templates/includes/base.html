@@ -4,6 +4,7 @@
         <title>Community Monero LWS</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#1a1a1f" />
         <link rel="shortcut icon" href="/static/images/favicon.ico" type="image/png">
         <meta itemprop="name" content="Community Monero LWS">
         <meta itemprop="description" content="Community Monero light-wallet server">
@@ -12,13 +13,15 @@
         <link rel="stylesheet" href="/static/fa/all.min.css">
         <script src="/static/htmx.js"></script>
       </head>
-      
+
 	<body>
 		<nav class="nav">
             <div class="nav-left">
               <a class="brand" href="/">Community LWS</a>
               <a class="{% if request.path == '/' %}active{% endif %}" href="/">Home</a>
               <a class="{% if request.path == '/register' %}active{% endif %}" href="/register">Register Wallet</a>
+              <a class="{% if request.path == '/wallet/lookup' %}active{% endif %}" href="/wallet/lookup">Wallet Status</a>
+              <a class="{% if request.path == '/about' %}active{% endif %}" href="/about">About</a>
             </div>
             <div class="nav-right">
                 {% if current_user.is_authenticated %}
@@ -28,11 +31,15 @@
             </div>
         </nav>
         <div class="container">
-            <div style="margin: 1em;">
-                {% for message in get_flashed_messages() %}
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <ul class="flash-messages">
+                {% for message in messages %}
                     <li>{{ message }}</li>
                 {% endfor %}
-            </div>
+            </ul>
+            {% endif %}
+            {% endwith %}
 		    {% block content %}
             {% endblock %}
         </div>

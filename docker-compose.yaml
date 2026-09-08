@@ -12,7 +12,6 @@ volumes:
 services:
   tor:
     container_name: lwstor
-    image: lalanza808/lwsadmin-tor
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile-tor
@@ -23,7 +22,6 @@ services:
     <<: *log-config
   lws:
     container_name: lws
-    image: lalanza808/lwsadmin-lws
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile-lws
@@ -45,7 +43,6 @@ services:
     <<: *log-config
   lwsadmin:
     container_name: lwsadmin
-    image: lalanza808/lwsadmin-lwsadmin
     build:
       context: lwsadmin
       dockerfile: Dockerfile

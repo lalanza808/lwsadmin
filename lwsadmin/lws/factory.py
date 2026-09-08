@@ -1,3 +1,5 @@
+import logging
+
 from quart import Quart, redirect, request
 from quart_auth import (
     AuthManager, Unauthorized
@@ -7,6 +9,12 @@ from lws import config
 
 
 def create_app():
+    # Configure logging so LWS API debug messages always appear
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    )
+
     app = Quart(__name__)
     app.config["SECRET_KEY"] = config.SECRET_KEY
     app.config["DEBUG"] = config.DEBUG

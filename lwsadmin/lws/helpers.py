@@ -1,9 +1,12 @@
 import json
+import logging
 from pathlib import Path
 
 import requests
 
 from lws import config
+
+logger = logging.getLogger("lws.helpers")
 
 def get_tor_hostname():
     hostname_path = Path(config.TOR_HOSTNAME_PATH)
@@ -39,8 +42,10 @@ class LWS:
     def __init__(self):
         self.data = get_lws_keys()
         if self.data is None:
-            print("[WARNING] LWS admin credentials not found or unreadable at "
-                  f"{config.LWS_KEY_PATH} - admin API calls will fail")
+            logger.warning(
+                "LWS admin credentials not found or unreadable at %s"
+                " - admin API calls will fail", config.LWS_KEY_PATH
+            )
             self.data = {"key": ""}
 
     def get_address_info(self, address, view_key):
@@ -49,7 +54,9 @@ class LWS:
             "address": address,
             "view_key": view_key
         }
+        logger.debug("POST %s for address=%s...", endpoint, address[:8])
         r = requests.post(endpoint, json=data, timeout=5)
+        logger.debug("POST %s returned status %d", endpoint, r.status_code)
         r.raise_for_status()
         return r.json()
 
@@ -74,7 +81,7 @@ class LWS:
                 return max_height
             return 0
         except Exception as e:
-            print(f"Failed to get current height: {e}")
+            logger.error("Failed to get current height: %s", e)
             return 0
 
     def get_wallet(self, address: str) -> dict:
@@ -90,7 +97,7 @@ class LWS:
                         return _wallet
             return {}
         except Exception as e:
-            print(f"Failed to check wallet active: {e}")
+            logger.error("Failed to check wallet active: %s", e)
             return {}
 
     def get_request(self, address: str) -> dict:
@@ -106,7 +113,7 @@ class LWS:
                         return req
             return {}
         except Exception as e:
-            print(f"Failed to check wallet request: {e}")
+            logger.error("Failed to check wallet request: %s", e)
             return {}
 
     def exists(self, address: str) -> bool:
@@ -114,7 +121,7 @@ class LWS:
             res = self.get_wallet(address)
             return False if res == {} else True
         except Exception as e:
-            print(f"Failed to check wallet active: {e}")
+            logger.error("Failed to check wallet exists: %s", e)
             return False
 
     def ensure_active(self, address: str, view_key: str) -> tuple[bool, str]:
@@ -152,26 +159,30 @@ class LWS:
         endpoint = f"{config.LWS_ADMIN_URL}/list_accounts"
         try:
             data = {"auth": self.data["key"]}
+            logger.debug("POST %s", endpoint)
             req = requests.post(endpoint, json=data, timeout=5)
+            logger.debug("POST %s returned status %d", endpoint, req.status_code)
             req.raise_for_status()
             if req.ok:
                 return req.json()
             return {}
         except Exception as e:
-            print(f"Failed to list accounts: {e}")
+            logger.error("Failed to list accounts: %s", e)
             return {}
 
     def list_requests(self) -> dict:
         endpoint = f"{config.LWS_ADMIN_URL}/list_requests"
         try:
             data = {"auth": self.data["key"]}
+            logger.debug("POST %s", endpoint)
             req = requests.post(endpoint, json=data, timeout=5)
+            logger.debug("POST %s returned status %d", endpoint, req.status_code)
             req.raise_for_status()
             if req.ok:
                 return req.json()
             return {}
         except Exception as e:
-            print(f"Failed to list accounts: {e}")
+            logger.error("Failed to list requests: %s", e)
             return {}
 
     def get_address_txs(self, address: str, view_key: str) -> dict:
@@ -181,13 +192,15 @@ class LWS:
             "view_key": view_key
         }
         try:
+            logger.debug("POST %s for address=%s...", endpoint, address[:8])
             req = requests.post(endpoint, json=data, timeout=5)
+            logger.debug("POST %s returned status %d", endpoint, req.status_code)
             req.raise_for_status()
             if req.ok:
                 return req.json()
             return {}
         except Exception as e:
-            print(f"Failed to get wallet info {address}: {e}")
+            logger.error("Failed to get address txs for %s...: %s", address[:8], e)
             return {}
 
     def add_wallet(self, address: str, view_key: str) -> dict:
@@ -200,13 +213,15 @@ class LWS:
                     "key": view_key
                 }
             }
+            logger.debug("POST %s for address=%s...", endpoint, address[:8])
             req = requests.post(endpoint, json=data, timeout=5)
+            logger.debug("POST %s returned status %d", endpoint, req.status_code)
             req.raise_for_status()
             if req.ok:
                 return req.json()
             return {}
         except Exception as e:
-            print(f"Failed to add wallet {address}: {e}")
+            logger.error("Failed to add wallet %s...: %s", address[:8], e)
             return {}
 
     def modify_wallet(self, address: str, status: str) -> dict:
@@ -219,13 +234,18 @@ class LWS:
                     "status": status
                 }
             }
+            logger.debug(
+                "POST %s for address=%s... status=%s",
+                endpoint, address[:8], status
+            )
             req = requests.post(endpoint, json=data, timeout=5)
+            logger.debug("POST %s returned status %d", endpoint, req.status_code)
             req.raise_for_status()
             if req.ok:
                 return req.json()
             return {}
         except Exception as e:
-            print(f"Failed to modify wallet {address}: {e}")
+            logger.error("Failed to modify wallet %s...: %s", address[:8], e)
             return {}
 
     def accept_request(self, address: str, req_type: str="create") -> dict:
@@ -238,13 +258,20 @@ class LWS:
                     "type": req_type
                 }
             }
+            logger.debug(
+                "POST %s for address=%s... type=%s",
+                endpoint, address[:8], req_type
+            )
             req = requests.post(endpoint, json=data, timeout=5)
+            logger.debug("POST %s returned status %d", endpoint, req.status_code)
             req.raise_for_status()
             if req.ok:
                 return req.json()
             return {}
         except Exception as e:
-            print(f"Failed to accept request wallet {address}: {e}")
+            logger.error(
+                "Failed to accept request for %s...: %s", address[:8], e
+            )
             return {}
 
     def reject_request(self, address: str, req_type: str="create") -> dict:
@@ -257,13 +284,20 @@ class LWS:
                     "type": req_type
                 }
             }
+            logger.debug(
+                "POST %s for address=%s... type=%s",
+                endpoint, address[:8], req_type
+            )
             req = requests.post(endpoint, json=data, timeout=5)
+            logger.debug("POST %s returned status %d", endpoint, req.status_code)
             req.raise_for_status()
             if req.ok:
                 return req.json()
             return {}
         except Exception as e:
-            print(f"Failed to reject request wallet {address}: {e}")
+            logger.error(
+                "Failed to reject request for %s...: %s", address[:8], e
+            )
             return {}
 
     def rescan(self, address: str, height: int) -> dict:
@@ -276,13 +310,18 @@ class LWS:
                     "height": height
                 }
             }
+            logger.debug(
+                "POST %s for address=%s... height=%d",
+                endpoint, address[:8], height
+            )
             req = requests.post(endpoint, json=data, timeout=5)
+            logger.debug("POST %s returned status %d", endpoint, req.status_code)
             req.raise_for_status()
             if req.ok:
                 return req.json()
             return {}
         except Exception as e:
-            print(f"Failed to rescan wallet {address}: {e}")
+            logger.error("Failed to rescan wallet %s...: %s", address[:8], e)
             return {}
 
     def validate(
@@ -304,13 +343,15 @@ class LWS:
                     "view_key_hex": view_key_hex
                 }
             }
+            logger.debug("POST %s", endpoint)
             req = requests.post(endpoint, json=data, timeout=5)
+            logger.debug("POST %s returned status %d", endpoint, req.status_code)
             req.raise_for_status()
             if req.ok:
                 return req.json()
             return {}
         except Exception as e:
-            print(f"Failed to validate keys: {e}")
+            logger.error("Failed to validate keys: %s", e)
             return {}
 
 

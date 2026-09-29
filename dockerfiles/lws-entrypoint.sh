@@ -17,4 +17,6 @@ monero-lws-daemon \
     --daemon ${DAEMON_ZMQ_PUB:-tcp://127.0.0.1:18082} \
     --sub ${DAEMON_ZMQ_SUB:-tcp://127.0.0.1:18083} \
     --access-control-origin "${CORS:-\*}" \
+    --auto-accept-creation \
+    --auto-accept-import \
     --max-subaddresses ${MAX_SUBADDRESS:-200}

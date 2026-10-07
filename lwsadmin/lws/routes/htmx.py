@@ -36,24 +36,11 @@ async def set_height():
 @bp.route("/show_wallets")
 @login_required
 async def show_wallets():
-    """Showing all wallets in the database in a table"""
+    """Showing all wallets in LWS"""
     lws = LWS()
     accounts = lws.list_accounts()
     if "hidden" in accounts:
         del accounts["hidden"]
-    # save wallets if they don't exist in the db
-    for status in accounts:
-        for account in accounts[status]:
-            w = Wallet.select().where(
-                Wallet.public_address == account["address"]
-            ).first()
-            if not w:
-                w = Wallet(
-                    email_address="",
-                    public_address=account["address"],
-                    secret_view_key=""
-                )
-                w.save()
     requests = lws.list_requests()
     if "import" in requests:
         del requests["import"]
